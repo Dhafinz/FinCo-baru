@@ -62,6 +62,34 @@ class BadgeSeeder extends Seeder
                 'required_level' => 10,
                 'required_xp' => 2000,
             ],
+            [
+                'name' => 'First Top Up',
+                'description' => 'Lakukan top up pertama di wallet FinCo',
+                'icon' => '✨',
+                'required_level' => 1,
+                'required_xp' => 50,
+            ],
+            [
+                'name' => 'Top Up Master',
+                'description' => 'Lakukan top up sebanyak 5 kali',
+                'icon' => '💳',
+                'required_level' => 2,
+                'required_xp' => 150,
+            ],
+            [
+                'name' => 'Social Saver',
+                'description' => 'Punya 3 teman yang accepted',
+                'icon' => '👥',
+                'required_level' => 3,
+                'required_xp' => 250,
+            ],
+            [
+                'name' => 'Generous',
+                'description' => 'Transfer ke teman sebanyak 3 kali',
+                'icon' => '💸',
+                'required_level' => 3,
+                'required_xp' => 300,
+            ],
         ];
 
         foreach ($badges as $badge) {

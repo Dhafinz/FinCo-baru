@@ -663,6 +663,8 @@
                 <li><a class="{{ ($activeFeature ?? '') === 'challenges' ? 'active' : '' }}" href="{{ route('dashboard.challenges') }}">Challenges <small>fitur</small></a></li>
                 <li><a class="{{ ($activeFeature ?? '') === 'badges' ? 'active' : '' }}" href="{{ route('dashboard.badges') }}">Badges <small>fitur</small></a></li>
                 <li><a class="{{ ($activeFeature ?? '') === 'leaderboard' ? 'active' : '' }}" href="{{ route('dashboard.leaderboard') }}">Leaderboard <small>fitur</small></a></li>
+                <li><a href="{{ route('dashboard.wallet') }}">Wallet <small>baru</small></a></li>
+                <li><a href="{{ route('dashboard.friends') }}">Teman <small>baru</small></a></li>
                 <li><a class="{{ ($activeFeature ?? '') === 'reports' ? 'active' : '' }}" href="{{ route('dashboard.reports') }}">Laporan <small>fitur</small></a></li>
                 <li><a class="{{ ($activeFeature ?? '') === 'settings' ? 'active' : '' }}" href="{{ route('dashboard.settings') }}">Pengaturan <small>fitur</small></a></li>
             </ul>

@@ -4,6 +4,8 @@ namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
 use App\Models\User;
+use App\Models\Wallet;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -42,16 +44,40 @@ class RegisteredUserController extends Controller
 
         $displayName = Str::of($request->full_name)->trim()->explode(' ')->first();
 
-        $user = User::create([
-            'name' => $displayName ?: $request->full_name,
-            'username' => Str::lower($request->username),
-            'full_name' => $request->full_name,
-            'email' => $request->email,
-            'phone' => $request->phone,
-            'date_of_birth' => $request->date_of_birth,
-            'role' => 'user',
-            'password' => Hash::make($request->password),
-        ]);
+        $user = DB::transaction(function () use ($request, $displayName) {
+            $createdUser = User::create([
+                'name' => $displayName ?: $request->full_name,
+                'username' => Str::lower($request->username),
+                'full_name' => $request->full_name,
+                'email' => $request->email,
+                'phone' => $request->phone,
+                'date_of_birth' => $request->date_of_birth,
+                'role' => 'user',
+                'password' => Hash::make($request->password),
+            ]);
+
+            Wallet::query()->firstOrCreate([
+                'user_id' => $createdUser->id,
+            ], [
+                'balance' => 0,
+                'currency' => 'IDR',
+                'is_active' => true,
+            ]);
+
+            DB::table('gamification_profiles')->updateOrInsert(
+                ['user_id' => $createdUser->id],
+                [
+                    'current_level' => 1,
+                    'total_xp' => 0,
+                    'current_streak' => 0,
+                    'last_login_date' => null,
+                    'created_at' => now(),
+                    'updated_at' => now(),
+                ]
+            );
+
+            return $createdUser;
+        });
 
         event(new Registered($user));
 

@@ -663,6 +663,8 @@
                 <li><a class="<?php echo e(($activeFeature ?? '') === 'challenges' ? 'active' : ''); ?>" href="<?php echo e(route('dashboard.challenges')); ?>">Challenges <small>fitur</small></a></li>
                 <li><a class="<?php echo e(($activeFeature ?? '') === 'badges' ? 'active' : ''); ?>" href="<?php echo e(route('dashboard.badges')); ?>">Badges <small>fitur</small></a></li>
                 <li><a class="<?php echo e(($activeFeature ?? '') === 'leaderboard' ? 'active' : ''); ?>" href="<?php echo e(route('dashboard.leaderboard')); ?>">Leaderboard <small>fitur</small></a></li>
+                <li><a href="<?php echo e(route('dashboard.wallet')); ?>">Wallet <small>baru</small></a></li>
+                <li><a href="<?php echo e(route('dashboard.friends')); ?>">Teman <small>baru</small></a></li>
                 <li><a class="<?php echo e(($activeFeature ?? '') === 'reports' ? 'active' : ''); ?>" href="<?php echo e(route('dashboard.reports')); ?>">Laporan <small>fitur</small></a></li>
                 <li><a class="<?php echo e(($activeFeature ?? '') === 'settings' ? 'active' : ''); ?>" href="<?php echo e(route('dashboard.settings')); ?>">Pengaturan <small>fitur</small></a></li>
             </ul>

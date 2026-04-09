@@ -2,7 +2,9 @@
 
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\GamificationController;
+use App\Http\Controllers\FriendController;
 use App\Http\Controllers\UserDashboardController;
+use App\Http\Controllers\WalletController;
 use App\Http\Controllers\Admin\AdminController;
 use App\Http\Controllers\Admin\TransactionController;
 use App\Http\Controllers\Admin\UserController;
@@ -36,6 +38,23 @@ Route::middleware(['auth'])->group(function () {
     
     Route::get('/dashboard/badges', [UserDashboardController::class, 'badges'])->name('dashboard.badges');
     Route::get('/dashboard/leaderboard', [UserDashboardController::class, 'leaderboard'])->name('dashboard.leaderboard');
+
+    Route::get('/dashboard/wallet', [WalletController::class, 'index'])->name('dashboard.wallet');
+    Route::get('/dashboard/wallet/topup', [WalletController::class, 'topupForm'])->name('dashboard.wallet.topup.form');
+    Route::post('/dashboard/wallet/topup', [WalletController::class, 'topup'])->name('dashboard.wallet.topup');
+    Route::get('/dashboard/wallet/withdraw', [WalletController::class, 'withdrawForm'])->name('dashboard.wallet.withdraw.form');
+    Route::post('/dashboard/wallet/withdraw', [WalletController::class, 'withdraw'])->name('dashboard.wallet.withdraw');
+    Route::get('/dashboard/wallet/transfer', [WalletController::class, 'transferForm'])->name('dashboard.wallet.transfer.form');
+    Route::post('/dashboard/wallet/transfer', [WalletController::class, 'transfer'])->name('dashboard.wallet.transfer');
+
+    Route::get('/dashboard/friends', [FriendController::class, 'index'])->name('dashboard.friends');
+    Route::post('/dashboard/friends/search', [FriendController::class, 'search'])->name('dashboard.friends.search');
+    Route::post('/dashboard/friends/add', [FriendController::class, 'sendRequest'])->name('dashboard.friends.add');
+    Route::post('/dashboard/friends/remove/{id}', [FriendController::class, 'remove'])->name('dashboard.friends.remove');
+    Route::post('/dashboard/friends/block/{id}', [FriendController::class, 'block'])->name('dashboard.friends.block');
+    Route::post('/dashboard/friends/accept/{id}', [FriendController::class, 'accept'])->name('dashboard.friends.accept');
+    Route::post('/dashboard/friends/reject/{id}', [FriendController::class, 'reject'])->name('dashboard.friends.reject');
+
     Route::get('/dashboard/reports', [UserDashboardController::class, 'reports'])->name('dashboard.reports');
     Route::get('/dashboard/settings', [UserDashboardController::class, 'settings'])->name('dashboard.settings');
 });

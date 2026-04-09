@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\ProfileUpdateRequest;
+use App\Models\UserBadge;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -18,6 +19,11 @@ class ProfileController extends Controller
     {
         return view('profile.edit', [
             'user' => $request->user(),
+            'userBadges' => UserBadge::query()
+                ->where('user_id', $request->user()->id)
+                ->with('badge')
+                ->latest('earned_at')
+                ->get(),
         ]);
     }
 
