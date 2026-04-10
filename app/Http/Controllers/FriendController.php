@@ -255,6 +255,42 @@ class FriendController extends Controller
         return redirect()->route('dashboard.friends')->with('success', 'User berhasil diblokir.');
     }
 
+    public function unblock(Request $request, int $id): RedirectResponse
+    {
+        $user = $request->user();
+
+        DB::transaction(function () use ($user, $id) {
+            // Ambil blocked_user_id sebelum delete
+            $blockedUserId = FriendBlock::query()
+                ->where('id', $id)
+                ->where('user_id', $user->id)
+                ->value('blocked_user_id');
+
+            if (!$blockedUserId) {
+                return;
+            }
+
+            // Hapus block record
+            FriendBlock::query()
+                ->where('id', $id)
+                ->where('user_id', $user->id)
+                ->delete();
+
+            // Restore friendship sebagai teman accepted (dua arah)
+            Friendship::firstOrCreate(
+                ['user_id' => $user->id, 'friend_id' => $blockedUserId],
+                ['status' => 'accepted']
+            );
+
+            Friendship::firstOrCreate(
+                ['user_id' => $blockedUserId, 'friend_id' => $user->id],
+                ['status' => 'accepted']
+            );
+        });
+
+        return redirect()->route('dashboard.friends')->with('success', 'Blokir berhasil dibuka dan ditambahkan kembali sebagai teman.');
+    }
+
     private function acceptedFriendsWithStats(int $userId): Collection
     {
         $friendIds = Friendship::query()

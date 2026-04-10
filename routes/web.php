@@ -52,6 +52,7 @@ Route::middleware(['auth'])->group(function () {
     Route::post('/dashboard/friends/add', [FriendController::class, 'sendRequest'])->name('dashboard.friends.add');
     Route::post('/dashboard/friends/remove/{id}', [FriendController::class, 'remove'])->name('dashboard.friends.remove');
     Route::post('/dashboard/friends/block/{id}', [FriendController::class, 'block'])->name('dashboard.friends.block');
+    Route::post('/dashboard/friends/unblock/{id}', [FriendController::class, 'unblock'])->name('dashboard.friends.unblock');
     Route::post('/dashboard/friends/accept/{id}', [FriendController::class, 'accept'])->name('dashboard.friends.accept');
     Route::post('/dashboard/friends/reject/{id}', [FriendController::class, 'reject'])->name('dashboard.friends.reject');
 

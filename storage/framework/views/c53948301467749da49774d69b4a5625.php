@@ -132,7 +132,7 @@
                         <div class="avatar"><?php echo e($friend['initials']); ?></div>
                         <div>
                             <div class="name"><?php echo e($friend['name']); ?></div>
-                            <div class="meta">{{ $friend['username'] }}</div>
+                            <div class="meta"><?php echo e($friend['username']); ?></div>
                             <span class="level <?php echo e($levelClass); ?>">Level <?php echo e($friend['level']); ?></span>
                             <div class="meta" style="margin-top:.18rem;">XP: <?php echo e(number_format($friend['xp'], 0, ',', '.')); ?></div>
                         </div>
@@ -169,7 +169,7 @@
                         <div class="avatar"><?php echo e($req['initials']); ?></div>
                         <div>
                             <div class="name"><?php echo e($req['name']); ?></div>
-                            <div class="meta">{{ $req['username'] }}</div>
+                            <div class="meta"><?php echo e($req['username']); ?></div>
                             <div class="meta">Level <?php echo e($req['level']); ?> • XP <?php echo e(number_format($req['xp'], 0, ',', '.')); ?></div>
                         </div>
                     </div>
@@ -198,11 +198,14 @@
                         <div class="avatar"><?php echo e(strtoupper(substr($blocked['name'] ?? 'U', 0, 1))); ?></div>
                         <div>
                             <div class="name"><?php echo e($blocked['name']); ?></div>
-                            <div class="meta">{{ $blocked['username'] }} • <?php echo e($blocked['email']); ?></div>
+                            <div class="meta"><?php echo e($blocked['username']); ?> • <?php echo e($blocked['email']); ?></div>
                         </div>
                     </div>
                     <div class="actions">
-                        <span class="btn" style="border-color:#fecdd3;background:#fff1f2;color:#9f1239;cursor:default;">BLOCKED</span>
+                        <form action="<?php echo e(route('dashboard.friends.unblock', $blocked['id'])); ?>" method="POST">
+                            <?php echo csrf_field(); ?>
+                            <button type="submit" class="btn btn-blue">🔓 Buka Blokir</button>
+                        </form>
                     </div>
                 </div>
             <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); if ($__empty_1): ?>
