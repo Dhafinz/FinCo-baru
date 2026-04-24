@@ -11,7 +11,7 @@ class Transaction extends Model
     use HasFactory;
 
     protected $fillable = [
-        'user_id', 'category_id', 'type', 'amount',
+        'user_id', 'category_id', 'budget_id', 'type', 'amount',
         'description', 'transaction_date', 'xp_earned'
     ];
 
@@ -28,6 +28,23 @@ class Transaction extends Model
     public function category()
     {
         return $this->belongsTo(Category::class);
+    }
+
+    public function budget()
+    {
+        return $this->belongsTo(Budget::class);
+    }
+
+    public function goalAllocations()
+    {
+        return $this->hasMany(\App\Models\TransactionGoalAllocation::class);
+    }
+
+    public function goals()
+    {
+        return $this->belongsToMany(FinancialGoal::class, 'transaction_goal_allocations', 'transaction_id', 'goal_id')
+            ->withPivot('allocated_amount')
+            ->withTimestamps();
     }
 
     public function scopeIncome(Builder $query): Builder

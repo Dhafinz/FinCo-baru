@@ -35,6 +35,8 @@ Route::middleware(['auth'])->group(function () {
     Route::post('/dashboard/challenges', [UserDashboardController::class, 'storeChallenge'])->name('dashboard.challenges.store');
     Route::put('/dashboard/challenges/{challenge}', [UserDashboardController::class, 'updateChallenge'])->name('dashboard.challenges.update');
     Route::delete('/dashboard/challenges/{challenge}', [UserDashboardController::class, 'destroyChallenge'])->name('dashboard.challenges.destroy');
+    Route::get('/dashboard/quests', [UserDashboardController::class, 'quests'])->name('dashboard.quests');
+    Route::post('/dashboard/quests/join', [UserDashboardController::class, 'joinQuest'])->name('dashboard.quests.join');
     
     Route::get('/dashboard/badges', [UserDashboardController::class, 'badges'])->name('dashboard.badges');
     Route::get('/dashboard/leaderboard', [UserDashboardController::class, 'leaderboard'])->name('dashboard.leaderboard');

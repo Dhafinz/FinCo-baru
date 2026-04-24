@@ -285,6 +285,33 @@
             color: #dbeafe;
         }
 
+        .hero-stack {
+            display: grid;
+            gap: 0.55rem;
+            min-width: 230px;
+        }
+
+        .hero-mini {
+            background: rgba(255, 255, 255, 0.10);
+            border: 1px solid rgba(255, 255, 255, 0.22);
+        }
+
+        .hero-mini .label {
+            display: block;
+            font-size: 0.76rem;
+            color: #dbeafe;
+            margin-bottom: 0.14rem;
+        }
+
+        .hero-mini .value {
+            display: block;
+            font-family: 'Sora', sans-serif;
+            font-size: 1.1rem;
+            line-height: 1.2;
+            font-weight: 800;
+            color: #fff;
+        }
+
         .stats {
             margin-top: 1rem;
             display: grid;
@@ -566,6 +593,396 @@
             line-height: 1.45;
         }
 
+        .quick-actions {
+            margin-top: 0.85rem;
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 0.75rem;
+        }
+
+        .quick-action {
+            display: block;
+            text-decoration: none;
+            padding: 0.95rem;
+            border: 1px solid #dbe8f6;
+            border-radius: 14px;
+            background: linear-gradient(180deg, #ffffff 0%, #f6faff 100%);
+            box-shadow: 0 8px 18px rgba(30, 64, 175, 0.05);
+            transition: transform 0.18s ease, box-shadow 0.18s ease, border-color 0.18s ease;
+            min-height: 138px;
+        }
+
+        .quick-action:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 12px 24px rgba(30, 64, 175, 0.10);
+            border-color: #bfdbfe;
+        }
+
+        .quick-action .quick-top {
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+            gap: 0.75rem;
+            margin-bottom: 0.7rem;
+        }
+
+        .quick-action .emoji {
+            width: 42px;
+            height: 42px;
+            border-radius: 12px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            background: #eff6ff;
+            font-size: 1.1rem;
+        }
+
+        .quick-action h3 {
+            font-size: 0.96rem;
+            margin-bottom: 0.2rem;
+            color: #16345d;
+        }
+
+        .quick-action p {
+            margin: 0;
+            color: var(--muted);
+            font-size: 0.8rem;
+            line-height: 1.45;
+        }
+
+        .quick-action .quick-foot {
+            margin-top: 0.85rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 0.5rem;
+            font-size: 0.76rem;
+            color: #406184;
+            font-weight: 600;
+        }
+
+        .quick-action .quick-foot span {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.3rem;
+            padding: 0.28rem 0.52rem;
+            border-radius: 999px;
+            background: #eff6ff;
+            color: #1d4ed8;
+        }
+
+        .quick-action.primary {
+            background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%);
+            border-color: #93c5fd;
+        }
+
+        .quick-action.warning {
+            background: linear-gradient(135deg, #fff7ed 0%, #ffedd5 100%);
+            border-color: #fdba74;
+        }
+
+        .quick-action.success {
+            background: linear-gradient(135deg, #ecfdf5 0%, #d1fae5 100%);
+            border-color: #86efac;
+        }
+
+        .quick-action.purple {
+            background: linear-gradient(135deg, #f5f3ff 0%, #ede9fe 100%);
+            border-color: #c4b5fd;
+        }
+
+        .mode-bar {
+            margin-top: 0.9rem;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+        }
+
+        .mode-bar a {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.35rem;
+            padding: 0.5rem 0.74rem;
+            border-radius: 999px;
+            border: 1px solid #dbe8f6;
+            background: #fff;
+            text-decoration: none;
+            color: #23436f;
+            font-size: 0.8rem;
+            font-weight: 700;
+        }
+
+        .mode-bar a.active {
+            background: #1d4ed8;
+            color: #fff;
+            border-color: #1d4ed8;
+        }
+
+        .transaction-flow {
+            margin-top: 1rem;
+            display: grid;
+            grid-template-columns: minmax(0, 1.25fr) minmax(280px, 0.75fr);
+            gap: 0.9rem;
+        }
+
+        .transaction-flow .panel,
+        .transaction-flow .transaction-create {
+            height: 100%;
+        }
+
+        .mode-banner {
+            margin-top: 1rem;
+            padding: 1rem 1.1rem;
+            border-radius: 16px;
+            border: 1px solid #cfe0ff;
+            background: linear-gradient(135deg, #0f2c56 0%, #1e56a0 60%, #3b82f6 100%);
+            color: #fff;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 1rem;
+            box-shadow: var(--shadow);
+        }
+
+        .mode-banner h2 {
+            font-size: 1.08rem;
+            margin-bottom: 0.25rem;
+        }
+
+        .mode-banner p {
+            color: #dbeafe;
+            margin: 0;
+            font-size: 0.84rem;
+            line-height: 1.45;
+        }
+
+        .mode-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.35rem;
+            padding: 0.36rem 0.68rem;
+            border-radius: 999px;
+            background: rgba(255, 255, 255, 0.16);
+            border: 1px solid rgba(255, 255, 255, 0.25);
+            font-size: 0.78rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+
+        .context-rail {
+            display: grid;
+            gap: 0.75rem;
+        }
+
+        .context-card {
+            border: 1px solid var(--line);
+            border-radius: 14px;
+            background: #fff;
+            padding: 0.9rem;
+        }
+
+        .context-card h3 {
+            font-size: 0.95rem;
+            margin-bottom: 0.18rem;
+        }
+
+        .context-card p {
+            margin: 0;
+            color: var(--muted);
+            font-size: 0.8rem;
+            line-height: 1.45;
+        }
+
+        .context-list {
+            margin-top: 0.7rem;
+            display: grid;
+            gap: 0.55rem;
+        }
+
+        .context-mini {
+            border-radius: 12px;
+            border: 1px solid #dbe8f6;
+            padding: 0.75rem 0.8rem;
+            background: #f9fcff;
+        }
+
+        .context-mini strong {
+            display: block;
+            margin-bottom: 0.14rem;
+            color: #123055;
+        }
+
+        .context-mini small {
+            color: var(--muted);
+        }
+
+        .expense-budget-list,
+        .income-goal-list {
+            display: grid;
+            gap: 0.5rem;
+            margin-top: 0.5rem;
+            grid-template-columns: 1fr;
+            width: 100%;
+        }
+
+        .skeleton-row {
+            height: 80px;
+            border-radius: 10px;
+            background: linear-gradient(90deg, #eef4fd 25%, #f8fbff 45%, #eef4fd 65%);
+            background-size: 220% 100%;
+            animation: shimmer 1.2s ease-in-out infinite;
+            border: 1px solid #dbe8f6;
+        }
+
+        @keyframes shimmer {
+            0% { background-position: 100% 0; }
+            100% { background-position: -100% 0; }
+        }
+
+        .budget-card,
+        .goal-card {
+            display: block;
+            width: 100%;
+            border: 1px solid #dbe8f6;
+            border-radius: 10px;
+            padding: 0.6rem 0.7rem;
+            background: #fff;
+            transition: border-color 0.18s ease, box-shadow 0.18s ease, background 0.18s ease;
+            cursor: pointer;
+            user-select: none;
+            box-sizing: border-box;
+        }
+
+        .budget-card:hover,
+        .goal-card:hover {
+            border-color: #93c5fd;
+            box-shadow: 0 8px 16px rgba(37, 99, 235, 0.08);
+        }
+
+        .budget-card.is-selected,
+        .goal-card.is-selected {
+            border-color: #3b82f6;
+            background: #eff6ff;
+            box-shadow: 0 10px 18px rgba(37, 99, 235, 0.14);
+        }
+
+        .budget-head,
+        .goal-head {
+            display: grid;
+            grid-template-columns: 18px minmax(0, 1fr);
+            gap: 0.5rem;
+            align-items: start;
+            width: 100%;
+        }
+
+        .budget-radio,
+        .goal-check {
+            width: 18px;
+            height: 18px;
+            margin-top: 0.12rem;
+            flex-shrink: 0;
+        }
+
+        .detail-grid {
+            margin-top: 0.3rem;
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 0.2rem;
+            font-size: 0.76rem;
+            color: #3f5f84;
+            line-height: 1.35;
+            word-break: break-word;
+            overflow-wrap: break-word;
+        }
+
+        .meter {
+            margin-top: 0.25rem;
+            height: 7px;
+            border-radius: 999px;
+            background: #e8eef8;
+            overflow: hidden;
+        }
+
+        .meter > span {
+            display: block;
+            height: 100%;
+            border-radius: 999px;
+            transition: width 0.3s ease, background 0.3s ease;
+        }
+
+        .locked-category {
+            border: 1px dashed #93c5fd;
+            border-radius: 8px;
+            background: #f5f9ff;
+            color: #1e3a8a;
+            padding: 0.5rem 0.55rem;
+            font-weight: 700;
+            font-size: 0.8rem;
+        }
+
+        .preview-card {
+            margin-top: 0.5rem;
+            border: 1px solid #dbe8f6;
+            border-radius: 10px;
+            padding: 0.6rem;
+            background: #f9fcff;
+            font-size: 0.78rem;
+            color: #2b486e;
+            line-height: 1.4;
+        }
+
+        .warn-box {
+            margin-top: 0.4rem;
+            border: 1px solid #fca5a5;
+            border-radius: 8px;
+            background: #fff1f2;
+            color: #9f1239;
+            padding: 0.45rem 0.55rem;
+            font-size: 0.75rem;
+            font-weight: 600;
+            line-height: 1.3;
+        }
+
+        .goal-alloc-row {
+            display: grid;
+            gap: 0.3rem;
+        }
+
+        .goal-alloc-row input[type="number"] {
+            padding: 0.5rem;
+            border: 1px solid #dbe8f6;
+            border-radius: 8px;
+            font-size: 0.8rem;
+        }
+
+        .quest-list {
+            margin-top: 0.8rem;
+            display: grid;
+            gap: 0.75rem;
+        }
+
+        .quest-card {
+            border: 1px solid #dbe8f6;
+            border-radius: 12px;
+            background: #fff;
+            padding: 0.8rem;
+        }
+
+        .quest-progress {
+            margin-top: 0.35rem;
+            height: 9px;
+            border-radius: 999px;
+            background: #e8eef8;
+            overflow: hidden;
+        }
+
+        .quest-progress > span {
+            display: block;
+            height: 100%;
+            border-radius: 999px;
+            transition: width 0.35s ease;
+        }
+
         @media (max-width: 980px) {
             .app-shell {
                 grid-template-columns: 1fr;
@@ -614,6 +1031,11 @@
                 grid-template-columns: repeat(2, minmax(140px, 1fr));
             }
 
+            .quick-actions,
+            .transaction-flow {
+                grid-template-columns: 1fr;
+            }
+
             .hero-pill { min-width: 0; }
         }
 
@@ -643,6 +1065,10 @@
             .feature-grid {
                 grid-template-columns: 1fr;
             }
+
+            .quick-actions {
+                grid-template-columns: 1fr;
+            }
         }
     </style>
 </head>
@@ -661,6 +1087,7 @@
                 <li><a class="<?php echo e(($activeFeature ?? '') === 'budgets' ? 'active' : ''); ?>" href="<?php echo e(route('dashboard.budgets')); ?>">Budget <small>fitur</small></a></li>
                 <li><a class="<?php echo e(($activeFeature ?? '') === 'goals' ? 'active' : ''); ?>" href="<?php echo e(route('dashboard.goals')); ?>">Goals <small>fitur</small></a></li>
                 <li><a class="<?php echo e(($activeFeature ?? '') === 'challenges' ? 'active' : ''); ?>" href="<?php echo e(route('dashboard.challenges')); ?>">Challenges <small>fitur</small></a></li>
+                <li><a class="<?php echo e(($activeFeature ?? '') === 'quests' ? 'active' : ''); ?>" href="<?php echo e(route('dashboard.quests')); ?>">Quest <small>baru</small></a></li>
                 <li><a class="<?php echo e(($activeFeature ?? '') === 'badges' ? 'active' : ''); ?>" href="<?php echo e(route('dashboard.badges')); ?>">Badges <small>fitur</small></a></li>
                 <li><a class="<?php echo e(($activeFeature ?? '') === 'leaderboard' ? 'active' : ''); ?>" href="<?php echo e(route('dashboard.leaderboard')); ?>">Leaderboard <small>fitur</small></a></li>
                 <li><a href="<?php echo e(route('dashboard.wallet')); ?>">Wallet <small>baru</small></a></li>
@@ -703,14 +1130,62 @@
                         <?php endif; ?>
 
                         <?php if(($activeFeature ?? 'overview') === 'overview'): ?>
+                            <?php
+                                $budgetStatuses = ($budgets ?? collect())->pluck('status')->filter()->values();
+                                $budgetStatusLabel = 'On Track';
+                                $budgetStatusColor = '#16a34a';
+                                $budgetStatusText = 'Semua budget masih aman';
+
+                                if ($budgetStatuses->contains('exceeded')) {
+                                    $budgetStatusLabel = 'Exceeded';
+                                    $budgetStatusColor = '#dc2626';
+                                    $budgetStatusText = 'Ada budget yang sudah lewat batas';
+                                } elseif ($budgetStatuses->contains('warning')) {
+                                    $budgetStatusLabel = 'Warning';
+                                    $budgetStatusColor = '#ca8a04';
+                                    $budgetStatusText = 'Ada budget yang sudah mendekati batas';
+                                }
+                            ?>
                             <section class="hero card">
                                 <div>
                                     <h1>Selamat datang kembali, <?php echo e($user->name); ?>.</h1>
-                                    <p>Ringkasan utama keuangan dan progres gamification kamu hari ini.</p>
+                                    <p>Ringkasan utama keuangan, budget, dan progres gamification kamu hari ini.</p>
                                 </div>
-                                <div class="hero-pill">
-                                    <strong>Level <?php echo e($currentLevel); ?></strong>
-                                    <span>Total XP: <?php echo e(number_format($totalXp, 0, ',', '.')); ?></span>
+                                <div class="hero-stack">
+                                    <div class="hero-pill hero-mini">
+                                        <span class="label">Level & XP</span>
+                                        <span class="value">Level <?php echo e($currentLevel); ?></span>
+                                        <span>Total XP: <?php echo e(number_format($totalXp, 0, ',', '.')); ?></span>
+                                    </div>
+                                    <div class="hero-pill hero-mini">
+                                        <span class="label">Balance</span>
+                                        <span class="value">Rp <?php echo e(number_format($balance, 0, ',', '.')); ?></span>
+                                        <span>Budget: <strong style="color:<?php echo e($budgetStatusColor); ?>;"><?php echo e($budgetStatusLabel); ?></strong></span>
+                                    </div>
+                                </div>
+                            </section>
+
+                            <section class="card panel" style="margin-top:1rem;">
+                                <h2>Snapshot Cepat</h2>
+                                <p>Dashboard ini dirancang agar kamu bisa masuk ke aksi yang paling sering dipakai tanpa banyak klik.</p>
+                                <div class="feature-grid" style="grid-template-columns: repeat(4, minmax(140px, 1fr));">
+                                    <article class="card feature-item">
+                                        <h3>Balance</h3>
+                                        <p>Rp <?php echo e(number_format($balance, 0, ',', '.')); ?></p>
+                                    </article>
+                                    <article class="card feature-item">
+                                        <h3>Budget</h3>
+                                        <p style="color:<?php echo e($budgetStatusColor); ?>;font-weight:700;"><?php echo e($budgetStatusLabel); ?></p>
+                                        <p><?php echo e($budgetStatusText); ?></p>
+                                    </article>
+                                    <article class="card feature-item">
+                                        <h3>Goals</h3>
+                                        <p><?php echo e(number_format(($goals ?? collect())->count(), 0, ',', '.')); ?> target aktif</p>
+                                    </article>
+                                    <article class="card feature-item">
+                                        <h3>Challenges</h3>
+                                        <p><?php echo e(number_format(($challenges ?? collect())->count(), 0, ',', '.')); ?> quest aktif</p>
+                                    </article>
                                 </div>
                             </section>
 
@@ -756,75 +1231,283 @@
                                 </article>
 
                                 <article class="card panel">
-                                    <h2>Akses Cepat Fitur</h2>
-                                    <p>Pilih fitur di sidebar kiri untuk buka modul yang kamu butuhkan.</p>
-                                    <div class="feature-grid">
-                                        <article class="card feature-item">
-                                            <h3>Transaksi</h3>
-                                            <p>Lihat catatan pemasukan dan pengeluaran terbaru.</p>
-                                        </article>
-                                        <article class="card feature-item">
-                                            <h3>Budget</h3>
-                                            <p>Pantau batas pengeluaran agar tetap sesuai rencana.</p>
-                                        </article>
-                                        <article class="card feature-item">
-                                            <h3>Goals</h3>
-                                            <p>Kelola target tabungan dan progress pencapaiannya.</p>
-                                        </article>
+                                    <h2>⚡ Quick Action</h2>
+                                    <p>Apa yang mau kamu lakukan hari ini? Pilih alur yang paling cepat.</p>
+
+                                    <div class="quick-actions">
+                                        <a href="<?php echo e(route('dashboard.transactions', ['mode' => 'general'])); ?>" class="quick-action primary">
+                                            <div class="quick-top">
+                                                <div>
+                                                    <h3>📝 Catat Transaksi</h3>
+                                                    <p>Masuk ke form transaksi umum. Pilih tipe dulu, lalu kategori akan menyesuaikan.</p>
+                                                </div>
+                                                <div class="emoji">📝</div>
+                                            </div>
+                                            <div class="quick-foot"><span>General flow</span><strong>Buka form</strong></div>
+                                        </a>
+
+                                        <a href="<?php echo e(route('dashboard.transactions', ['mode' => 'expense'])); ?>" class="quick-action warning">
+                                            <div class="quick-top">
+                                                <div>
+                                                    <h3>💸 Bayar / Expense</h3>
+                                                    <p>Input pengeluaran dan lihat budget aktif yang sedang berjalan sebelum simpan.</p>
+                                                </div>
+                                                <div class="emoji">💸</div>
+                                            </div>
+                                            <div class="quick-foot"><span>Budget aware</span><strong>Cek budget</strong></div>
+                                        </a>
+
+                                        <a href="<?php echo e(route('dashboard.transactions', ['mode' => 'income'])); ?>" class="quick-action success">
+                                            <div class="quick-top">
+                                                <div>
+                                                    <h3>💰 Terima / Income</h3>
+                                                    <p>Catat pemasukan dengan kategori income dan pantau target tabungan.</p>
+                                                </div>
+                                                <div class="emoji">💰</div>
+                                            </div>
+                                            <div class="quick-foot"><span>Goal aware</span><strong>Catat income</strong></div>
+                                        </a>
+
+                                        <a href="<?php echo e(route('dashboard.quests')); ?>" class="quick-action purple">
+                                            <div class="quick-top">
+                                                <div>
+                                                    <h3>🎯 Quest Harian</h3>
+                                                    <p>Lihat challenge aktif, progress, dan reward XP yang bisa diklaim.</p>
+                                                </div>
+                                                <div class="emoji">🎯</div>
+                                            </div>
+                                            <div class="quick-foot"><span>Gamification</span><strong>Buka quest</strong></div>
+                                        </a>
                                     </div>
                                 </article>
                             </section>
                         <?php elseif($activeFeature === 'transactions'): ?>
-                            <section class="hero card">
+                            <?php
+                                $transactionMode = $actionMode ?? 'general';
+                                $transactionModeLabel = match ($transactionMode) {
+                                    'expense' => 'Bayar / Expense',
+                                    'income' => 'Terima / Income',
+                                    default => 'Catat Transaksi',
+                                };
+                                $transactionModeCopy = match ($transactionMode) {
+                                    'expense' => 'Pilih budget aktif yang relevan, lalu catat pengeluaran agar budget auto-ter-update.',
+                                    'income' => 'Catat pemasukan dan lihat kategori income yang paling sesuai.',
+                                    default => 'Pilih tipe transaksi dulu, lalu kategori akan mengikuti tipe yang dipilih.',
+                                };
+                                $selectedType = old('type', $transactionMode === 'expense' ? 'expense' : ($transactionMode === 'income' ? 'income' : ''));
+                                $categoryCollection = ($categoryOptions ?? collect())->values();
+                            ?>
+
+                            <section class="mode-banner card">
                                 <div>
-                                    <h1>Fitur Transaksi</h1>
-                                    <p>Kelola transaksi: tambah, edit, dan hapus langsung dari halaman ini.</p>
+                                    <div class="mode-badge">⚡ Quick Action</div>
+                                    <h2><?php echo e($transactionModeLabel); ?></h2>
+                                    <p><?php echo e($transactionModeCopy); ?></p>
                                 </div>
-                                <div class="hero-pill">
-                                    <strong><?php echo e(number_format($transactionCount, 0, ',', '.')); ?></strong>
-                                    <span>Total transaksi tercatat</span>
+                                <div class="mode-bar">
+                                    <a class="<?php echo e($transactionMode === 'general' ? 'active' : ''); ?>" href="<?php echo e(route('dashboard.transactions', ['mode' => 'general'])); ?>">📝 General</a>
+                                    <a class="<?php echo e($transactionMode === 'expense' ? 'active' : ''); ?>" href="<?php echo e(route('dashboard.transactions', ['mode' => 'expense'])); ?>">💸 Expense</a>
+                                    <a class="<?php echo e($transactionMode === 'income' ? 'active' : ''); ?>" href="<?php echo e(route('dashboard.transactions', ['mode' => 'income'])); ?>">💰 Income</a>
+                                    <a href="<?php echo e(route('dashboard.quests')); ?>">🎯 Quest</a>
                                 </div>
                             </section>
 
-                            <section class="card transaction-create">
-                                <h2>Tambah Transaksi</h2>
-                                <p style="margin-top:0.2rem;color:var(--muted);font-size:0.84rem;">Catat pemasukan atau pengeluaran harian kamu.</p>
-                                <form action="<?php echo e(route('dashboard.transactions.store')); ?>" method="POST" style="margin-top:0.75rem;">
-                                    <?php echo csrf_field(); ?>
-                                    <div class="form-grid">
-                                        <div class="field">
-                                            <label for="trx_type">Tipe</label>
-                                            <select id="trx_type" name="type" required>
-                                                <option value="income">Income</option>
-                                                <option value="expense">Expense</option>
-                                            </select>
+                            <section class="transaction-flow">
+                                <article class="card transaction-create">
+                                    <h2><?php echo e($transactionModeLabel); ?></h2>
+                                    <p style="margin-top:0.2rem;color:var(--muted);font-size:0.84rem;"><?php echo e($transactionModeCopy); ?></p>
+
+                                    <?php if($transactionMode === 'expense'): ?>
+                                        <form action="<?php echo e(route('dashboard.transactions.store')); ?>" method="POST" style="margin-top:0.75rem;" id="expenseForm">
+                                            <?php echo csrf_field(); ?>
+                                            <input type="hidden" name="type" value="expense">
+
+                                            <div class="field" style="margin-bottom:0.7rem;">
+                                                <label>🎯 Pilih Budget Aktif *</label>
+                                                <small style="display:block;color:var(--muted);margin-top:0.16rem;">Pilih budget mana yang mau dipakai</small>
+
+                                                <div id="expenseBudgetSkeleton" class="expense-budget-list" style="margin-top:0.55rem;">
+                                                    <div class="skeleton-row"></div>
+                                                    <div class="skeleton-row"></div>
+                                                </div>
+
+                                                <div id="expenseBudgetCards" class="expense-budget-list" style="display:none;">
+                                                    <?php $__empty_1 = true; $__currentLoopData = ($budgets ?? collect()); $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $budget): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); $__empty_1 = false; ?>
+                                                        <?php
+                                                            $budgetPct = (int) round($budget->percentageUsed());
+                                                            $budgetBarColor = $budgetPct >= 100 ? '#ef4444' : ($budgetPct >= 80 ? '#f59e0b' : '#16a34a');
+                                                        ?>
+                                                        <label class="budget-card" data-budget-card="<?php echo e($budget->id); ?>">
+                                                            <div class="budget-head">
+                                                                <input type="radio" name="budget_id" value="<?php echo e($budget->id); ?>" class="budget-radio expense-budget-radio" required data-budget-name="<?php echo e(ucfirst($budget->category)); ?>" data-budget-limit="<?php echo e((float) $budget->limit_amount); ?>" data-budget-spent="<?php echo e((float) ($budget->spent_amount ?? 0)); ?>" data-budget-category-label="<?php echo e(ucfirst($budget->category)); ?>" data-budget-status="<?php echo e($budget->getStatusLabel()); ?>" data-budget-color="<?php echo e($budgetBarColor); ?>">
+                                                                <div style="min-width:0;">
+                                                                    <strong style="font-size:0.9rem;display:block;margin-bottom:0.18rem;color:#1f2937;line-height:1.25;"><?php echo e(ucfirst($budget->category)); ?></strong>
+                                                                    <div class="detail-grid">
+                                                                        <span>Target: Rp <?php echo e(number_format((float) $budget->limit_amount, 0, ',', '.')); ?></span>
+                                                                        <span>Terpakai: Rp <?php echo e(number_format((float) ($budget->spent_amount ?? 0), 0, ',', '.')); ?> (<?php echo e($budgetPct); ?>%)</span>
+                                                                        <span>Sisa: Rp <?php echo e(number_format($budget->remainingAmount(), 0, ',', '.')); ?></span>
+                                                                    </div>
+                                                                    <div class="meter"><span style="width: <?php echo e(min(100, $budgetPct)); ?>%; background: <?php echo e($budgetBarColor); ?>;"></span></div>
+                                                                    <small style="display:block;margin-top:0.2rem;color:<?php echo e($budgetBarColor); ?>;font-weight:700;font-size:0.73rem;"><?php echo e($budget->getStatusLabel()); ?></small>
+                                                                </div>
+                                                            </div>
+                                                        </label>
+                                                    <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); if ($__empty_1): ?>
+                                                        <div class="placeholder">Belum ada budget aktif. Buat budget dulu agar flow expense bisa dipakai.</div>
+                                                    <?php endif; ?>
+                                                </div>
+                                            </div>
+
+                                            <div class="form-grid">
+                                                <div class="field">
+                                                    <label for="expense_amount">Amount (Rp)</label>
+                                                    <input id="expense_amount" type="number" min="0" step="0.01" name="amount" value="<?php echo e(old('amount')); ?>" required>
+                                                </div>
+                                                <div class="field">
+                                                    <label for="expense_date">Tanggal</label>
+                                                    <input id="expense_date" type="date" name="transaction_date" value="<?php echo e(old('transaction_date', now()->toDateString())); ?>" required>
+                                                </div>
+                                                <div class="field">
+                                                    <label>Kategori (Auto dari Budget) 🔒</label>
+                                                    <div class="locked-category" id="expenseLockedCategory">Pilih budget dulu</div>
+                                                </div>
+                                                <div class="field field-2">
+                                                    <label for="expense_desc">Deskripsi</label>
+                                                    <input id="expense_desc" type="text" name="description" maxlength="255" value="<?php echo e(old('description')); ?>" placeholder="Contoh: Bensin motor">
+                                                </div>
+                                            </div>
+
+                                            <div id="expensePreview" class="preview-card" style="display:none;"></div>
+                                            <div id="expenseWarning" class="warn-box" style="display:none;">⚠️ Budget ini akan terlampaui jika transaksi disimpan.</div>
+
+                                            <div class="row-actions">
+                                                <button type="submit" class="btn btn-primary">💾 Ya, Bayar Sekarang</button>
+                                                <a href="<?php echo e(route('dashboard.transactions', ['mode' => 'general'])); ?>" class="btn btn-soft" style="text-decoration:none;display:inline-flex;align-items:center;">Batal</a>
+                                            </div>
+                                        </form>
+                                    <?php elseif($transactionMode === 'income'): ?>
+                                        <form action="<?php echo e(route('dashboard.transactions.store')); ?>" method="POST" style="margin-top:0.75rem;" id="incomeForm">
+                                            <?php echo csrf_field(); ?>
+                                            <input type="hidden" name="type" value="income">
+
+                                            <div class="form-grid">
+                                                <div class="field">
+                                                    <label for="income_amount">Total Amount (Rp)</label>
+                                                    <input id="income_amount" type="number" min="0" step="0.01" name="amount" value="<?php echo e(old('amount')); ?>" required>
+                                                </div>
+                                                <div class="field">
+                                                    <label for="income_category">Kategori Income</label>
+                                                    <select id="income_category" name="category_id" required>
+                                                        <option value="">Pilih kategori</option>
+                                                        <?php $__currentLoopData = ($categoryCollection ?? collect()); $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $category): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                                                            <?php if($category->type === 'income'): ?>
+                                                                <option value="<?php echo e($category->id); ?>" <?php echo e((string) old('category_id') === (string) $category->id ? 'selected' : ''); ?>><?php echo e($category->name); ?></option>
+                                                            <?php endif; ?>
+                                                        <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+                                                    </select>
+                                                </div>
+                                                <div class="field">
+                                                    <label for="income_date">Tanggal</label>
+                                                    <input id="income_date" type="date" name="transaction_date" value="<?php echo e(old('transaction_date', now()->toDateString())); ?>" required>
+                                                </div>
+                                                <div class="field field-2">
+                                                    <label for="income_desc">Deskripsi</label>
+                                                    <input id="income_desc" type="text" name="description" maxlength="255" value="<?php echo e(old('description')); ?>" placeholder="Contoh: Gaji bulan April">
+                                                </div>
+                                            </div>
+
+                                            <div class="field" style="margin-top:0.8rem;">
+                                                <label for="income_goal_id">🎯 Pilih Goal</label>
+                                                <small style="display:block;color:var(--muted);margin-top:0.16rem;">Pilih goal tujuan, lalu nominal alokasi akan mengikuti total income.</small>
+
+                                                <div id="incomeGoalSkeleton" class="income-goal-list" style="margin-top:0.55rem;">
+                                                    <div class="skeleton-row"></div>
+                                                    <div class="skeleton-row"></div>
+                                                </div>
+
+                                                <div id="incomeGoalCards" class="income-goal-list" style="display:none;">
+                                                    <select id="income_goal_id" name="goal_id" required>
+                                                        <option value="">Pilih goal</option>
+                                                        <?php $__empty_1 = true; $__currentLoopData = ($goals ?? collect()); $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $goal): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); $__empty_1 = false; ?>
+                                                            <?php
+                                                                $goalPct = (float) $goal->progressPercentage();
+                                                            ?>
+                                                            <option value="<?php echo e($goal->id); ?>" data-goal-name="<?php echo e($goal->name); ?>" data-goal-target="<?php echo e((float) $goal->target_amount); ?>" data-goal-current="<?php echo e((float) $goal->current_amount); ?>" data-goal-progress="<?php echo e($goalPct); ?>" <?php echo e((string) old('goal_id') === (string) $goal->id ? 'selected' : ''); ?>><?php echo e($goal->name); ?> - <?php echo e(number_format($goalPct, 2)); ?>%</option>
+                                                        <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); if ($__empty_1): ?>
+                                                            <option value="">Belum ada goal aktif</option>
+                                                        <?php endif; ?>
+                                                    </select>
+                                                </div>
+                                            </div>
+
+                                            <div id="incomeSummary" class="preview-card" style="display:none;"></div>
+
+                                            <div class="row-actions">
+                                                <button type="submit" class="btn btn-primary">💾 Simpan & Alokasikan</button>
+                                                <a href="<?php echo e(route('dashboard.transactions', ['mode' => 'general'])); ?>" class="btn btn-soft" style="text-decoration:none;display:inline-flex;align-items:center;">Batal</a>
+                                            </div>
+                                        </form>
+                                    <?php else: ?>
+                                        <form action="<?php echo e(route('dashboard.transactions.store')); ?>" method="POST" style="margin-top:0.75rem;" id="transactionQuickForm">
+                                            <?php echo csrf_field(); ?>
+                                            <div class="form-grid">
+                                                <div class="field">
+                                                    <label for="trx_type">Tipe</label>
+                                                    <select id="trx_type" name="type" required>
+                                                        <option value="" <?php echo e($selectedType === '' ? 'selected' : ''); ?>>Pilih tipe</option>
+                                                        <option value="income" <?php echo e($selectedType === 'income' ? 'selected' : ''); ?>>Income</option>
+                                                        <option value="expense" <?php echo e($selectedType === 'expense' ? 'selected' : ''); ?>>Expense</option>
+                                                    </select>
+                                                </div>
+                                                <div class="field">
+                                                    <label for="trx_amount">Amount</label>
+                                                    <input id="trx_amount" type="number" min="0" step="0.01" name="amount" value="<?php echo e(old('amount')); ?>" required>
+                                                </div>
+                                                <div class="field">
+                                                    <label for="trx_date">Tanggal</label>
+                                                    <input id="trx_date" type="date" name="transaction_date" value="<?php echo e(old('transaction_date', now()->toDateString())); ?>" required>
+                                                </div>
+                                                <div class="field">
+                                                    <label for="trx_category">Kategori</label>
+                                                    <select id="trx_category" name="category_id" required>
+                                                        <option value="">Pilih kategori</option>
+                                                        <?php $__currentLoopData = $categoryCollection; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $category): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                                                            <option value="<?php echo e($category->id); ?>" data-category-type="<?php echo e($category->type); ?>" <?php echo e((string) old('category_id') === (string) $category->id ? 'selected' : ''); ?>><?php echo e(ucfirst($category->type)); ?> - <?php echo e($category->name); ?></option>
+                                                        <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+                                                    </select>
+                                                </div>
+                                                <div class="field field-2">
+                                                    <label for="trx_desc">Deskripsi</label>
+                                                    <input id="trx_desc" type="text" name="description" maxlength="255" value="<?php echo e(old('description')); ?>" placeholder="Contoh: Gaji bulanan / Belanja mingguan">
+                                                </div>
+                                            </div>
+
+                                            <div class="row-actions">
+                                                <button type="submit" class="btn btn-primary">Simpan Transaksi</button>
+                                                <a href="<?php echo e(route('dashboard.transactions')); ?>" class="btn btn-soft" style="text-decoration:none;display:inline-flex;align-items:center;">Reset Mode</a>
+                                            </div>
+                                        </form>
+                                    <?php endif; ?>
+                                </article>
+
+                                <aside class="context-rail">
+                                    <?php if($transactionMode === 'expense'): ?>
+                                        <div class="context-card">
+                                            <h3>Preview Budget</h3>
+                                            <p>Pilih budget, isi nominal, dan preview akan update real-time termasuk before/after serta estimasi XP.</p>
                                         </div>
-                                        <div class="field">
-                                            <label for="trx_amount">Amount</label>
-                                            <input id="trx_amount" type="number" min="0" step="0.01" name="amount" value="<?php echo e(old('amount')); ?>" required>
+                                    <?php elseif($transactionMode === 'income'): ?>
+                                        <div class="context-card">
+                                            <h3>Summary Alokasi</h3>
+                                            <p>Summary allocation, achievement check, dan total XP akan dihitung otomatis saat kamu isi nominal.</p>
                                         </div>
-                                        <div class="field">
-                                            <label for="trx_date">Tanggal</label>
-                                            <input id="trx_date" type="date" name="transaction_date" value="<?php echo e(old('transaction_date', now()->toDateString())); ?>" required>
+                                    <?php else: ?>
+                                        <div class="context-card">
+                                            <h3>Flow cepat</h3>
+                                            <p>Mode general untuk input fleksibel. Gunakan mode expense/income untuk flow guided.</p>
                                         </div>
-                                        <div class="field">
-                                            <label for="trx_category">Kategori</label>
-                                            <select id="trx_category" name="category_id">
-                                                <option value="">Pilih kategori</option>
-                                                <?php $__currentLoopData = ($categoryOptions ?? collect()); $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $category): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
-                                                    <option value="<?php echo e($category->id); ?>"><?php echo e(ucfirst($category->type)); ?> - <?php echo e($category->name); ?></option>
-                                                <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
-                                            </select>
-                                        </div>
-                                        <div class="field field-2">
-                                            <label for="trx_desc">Deskripsi</label>
-                                            <input id="trx_desc" type="text" name="description" maxlength="255" value="<?php echo e(old('description')); ?>" placeholder="Contoh: Gaji bulanan / Belanja mingguan">
-                                        </div>
-                                    </div>
-                                    <div class="row-actions">
-                                        <button type="submit" class="btn btn-primary">Simpan Transaksi</button>
-                                    </div>
-                                </form>
+                                    <?php endif; ?>
+                                </aside>
                             </section>
 
                             <section class="layout">
@@ -994,7 +1677,18 @@
                                                 <div style="width:100%;">
                                                     <h3><?php echo e(ucfirst($budget->category)); ?> - Rp <?php echo e(number_format($budget->limit_amount, 0, ',', '.')); ?></h3>
                                                     <p>Periode: <?php echo e(\Illuminate\Support\Carbon::parse($budget->period_start)->format('d M')); ?> - <?php echo e(\Illuminate\Support\Carbon::parse($budget->period_end)->format('d M Y')); ?> • <?php echo e(ucfirst($budget->period)); ?></p>
-                                                    <p style="margin-top:0.3rem;font-size:0.82rem;">Terpakai: Rp <?php echo e(number_format($budget->spent_amount ?? 0, 0, ',', '.')); ?> (<?php echo e($budget->percentageUsed() ?? 0); ?>%)</p>
+                                                    
+                                                    <!-- Progress Bar & Tracking -->
+                                                    <div style="margin-top:0.6rem;">
+                                                        <div style="display:flex;justify-content:space-between;margin-bottom:0.35rem;font-size:0.82rem;">
+                                                            <span style="color:#55708d;">Terpakai: <strong>Rp <?php echo e(number_format($budget->spent_amount ?? 0, 0, ',', '.')); ?></strong></span>
+                                                            <span style="color:#3b82f6;">Sisa: <strong>Rp <?php echo e(number_format($budget->remainingAmount(), 0, ',', '.')); ?></strong></span>
+                                                        </div>
+                                                        <div style="background:#f0f3f7;height:8px;border-radius:4px;overflow:hidden;">
+                                                            <div style="background:<?php echo e($budget->getStatusColor()); ?>;height:100%;width:min(100%, <?php echo e($budget->percentageUsed()); ?>%);"></div>
+                                                        </div>
+                                                        <div style="margin-top:0.35rem;font-size:0.82rem;color:#55708d;">Progress: <?php echo e(round($budget->percentageUsed())); ?>%</div>
+                                                    </div>
 
                                                     <?php if(($editingBudgetId ?? 0) === $budget->id): ?>
                                                         <form action="<?php echo e(route('dashboard.budgets.update', $budget)); ?>" method="POST" style="margin-top:0.7rem;">
@@ -1050,8 +1744,8 @@
                                                         </form>
                                                     <?php endif; ?>
                                                 </div>
-                                                <div style="text-align:right; min-width: 165px;">
-                                                    <span class="badge" style="background: <?php echo e($budget->percentageUsed() >= 90 ? '#fee2e2' : '#dcfce7'); ?>; color: <?php echo e($budget->percentageUsed() >= 90 ? '#991b1b' : '#166534'); ?>;"><?php echo e($budget->percentageUsed() ?? 0); ?>%</span>
+                                                <div style="text-align:right; min-width: 180px;">
+                                                    <span class="badge" style="display:inline-block;background:<?php echo e($budget->getStatusColor()); ?>;color:#fff;padding:0.4rem 0.6rem;border-radius:6px;font-size:0.75rem;font-weight:700;margin-bottom:0.5rem;"><?php echo e($budget->getStatusLabel()); ?></span>
                                                     <div style="margin-top:0.25rem;font-weight:700;color:#1f3b63;"><?php echo e($budget->is_active ? 'Aktif' : 'Nonaktif'); ?></div>
                                                     <div class="row-actions" style="justify-content:flex-end;">
                                                         <a href="<?php echo e(route('dashboard.budgets', ['edit' => $budget->id])); ?>" class="btn btn-soft" style="text-decoration:none;display:inline-flex;align-items:center;">Edit</a>
@@ -1121,6 +1815,13 @@
                                                     <h3><?php echo e($goal->name); ?></h3>
                                                     <p>Target: Rp <?php echo e(number_format($goal->target_amount, 0, ',', '.')); ?> • Saat ini: Rp <?php echo e(number_format($goal->current_amount ?? 0, 0, ',', '.')); ?> • Status: <?php echo e(ucfirst($goal->status)); ?></p>
                                                     <p style="margin-top:0.3rem;font-size:0.82rem;">Progress: <?php echo e($goal->progressPercentage() ?? 0); ?>% • Sisa <?php echo e($goal->daysRemaining() ?? 0); ?> hari</p>
+                                                    <?php
+                                                        $goalProgress = (float) $goal->progressPercentage();
+                                                        $goalProgressColor = $goalProgress >= 100 ? '#16a34a' : ($goalProgress >= 80 ? '#f59e0b' : '#3b82f6');
+                                                    ?>
+                                                    <div class="meter" style="margin-top:0.45rem;max-width:360px;">
+                                                        <span style="width: <?php echo e(min(100, $goalProgress)); ?>%; background: <?php echo e($goalProgressColor); ?>;"></span>
+                                                    </div>
 
                                                     <?php if(($editingGoalId ?? 0) === $goal->id): ?>
                                                         <form action="<?php echo e(route('dashboard.goals.update', $goal)); ?>" method="POST" style="margin-top:0.7rem;">
@@ -1311,6 +2012,57 @@
                                             </div>
                                         <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); if ($__empty_1): ?>
                                             <div class="placeholder">Belum ada challenge. Mulai dengan membuat challenge pertama untuk latih disiplin finansial.</div>
+                                        <?php endif; ?>
+                                    </div>
+                                </article>
+                            </section>
+                        <?php elseif($activeFeature === 'quests'): ?>
+                            <section class="hero card">
+                                <div>
+                                    <h1>🎯 Quest Harian</h1>
+                                    <p>Pantau quest aktif kamu, progress real-time, dan join quest baru untuk reward XP.</p>
+                                </div>
+                                <div class="hero-pill">
+                                    <strong><?php echo e(number_format(($questActiveCards ?? collect())->count(), 0, ',', '.')); ?></strong>
+                                    <span>Quest aktif saat ini</span>
+                                </div>
+                            </section>
+
+                            <section class="layout">
+                                <article class="card panel" style="grid-column: 1 / -1;">
+                                    <h2>🔥 Quest Aktif Kamu</h2>
+                                    <p>Progress quest aktif akan diperbarui otomatis setiap transaksi baru.</p>
+                                    <div class="quest-list">
+                                        <?php $__empty_1 = true; $__currentLoopData = ($questActiveCards ?? collect()); $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $quest): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); $__empty_1 = false; ?>
+                                            <div class="quest-card">
+                                                <h3><?php echo e($quest['name']); ?></h3>
+                                                <p><?php echo e($quest['label']); ?></p>
+                                                <div class="quest-progress"><span style="width: <?php echo e($quest['percentage']); ?>%; background: <?php echo e($quest['bar_color']); ?>;"></span></div>
+                                                <p style="margin-top:0.35rem;font-size:0.8rem;color:var(--muted);">Reward: +<?php echo e($quest['reward_xp']); ?> XP • Deadline: <?php echo e($quest['days_remaining']); ?> hari lagi • Status: <?php echo e($quest['is_completed'] ? '✅ Completed' : '🟡 Active'); ?></p>
+                                            </div>
+                                        <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); if ($__empty_1): ?>
+                                            <div class="placeholder">Belum ada quest aktif. Join quest dari daftar di bawah.</div>
+                                        <?php endif; ?>
+                                    </div>
+                                </article>
+
+                                <article class="card panel" style="grid-column: 1 / -1;">
+                                    <h2>📜 Quest Tersedia</h2>
+                                    <p>Pilih quest yang ingin diikuti sekarang.</p>
+                                    <div class="quest-list">
+                                        <?php $__empty_1 = true; $__currentLoopData = ($questAvailableTemplates ?? collect()); $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $questTpl): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); $__empty_1 = false; ?>
+                                            <div class="quest-card">
+                                                <h3><?php echo e($questTpl['name']); ?></h3>
+                                                <p><?php echo e($questTpl['description']); ?></p>
+                                                <p style="margin-top:0.35rem;font-size:0.8rem;color:var(--muted);">Reward: +<?php echo e($questTpl['reward_xp']); ?> XP • Difficulty: <?php echo e(ucfirst($questTpl['difficulty'])); ?> • Durasi: <?php echo e($questTpl['duration_days']); ?> hari</p>
+                                                <form action="<?php echo e(route('dashboard.quests.join')); ?>" method="POST" style="margin-top:0.55rem;">
+                                                    <?php echo csrf_field(); ?>
+                                                    <input type="hidden" name="quest_key" value="<?php echo e($questTpl['key']); ?>">
+                                                    <button class="btn btn-soft" type="submit">✨ Join Quest</button>
+                                                </form>
+                                            </div>
+                                        <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); if ($__empty_1): ?>
+                                            <div class="placeholder">Semua quest sedang aktif atau belum ada template quest.</div>
                                         <?php endif; ?>
                                     </div>
                                 </article>
@@ -1506,6 +2258,205 @@
             </main>
         </div>
     </div>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const typeSelect = document.getElementById('trx_type');
+            const categorySelect = document.getElementById('trx_category');
+
+            if (typeSelect && categorySelect) {
+                const categoryOptions = Array.from(categorySelect.querySelectorAll('option[data-category-type]'));
+
+                function syncCategoryOptions() {
+                    const selectedType = typeSelect.value;
+                    let firstVisibleOption = null;
+
+                    categoryOptions.forEach(function (option) {
+                        const isMatch = selectedType !== '' && option.dataset.categoryType === selectedType;
+                        option.hidden = !isMatch;
+                        option.disabled = !isMatch;
+
+                        if (isMatch && !firstVisibleOption) {
+                            firstVisibleOption = option;
+                        }
+                    });
+
+                    const selectedOption = categorySelect.selectedOptions[0];
+                    const shouldReset = !selectedOption || selectedOption.hidden || selectedOption.disabled || selectedOption.value === '';
+
+                    if (shouldReset) {
+                        categorySelect.value = firstVisibleOption ? firstVisibleOption.value : '';
+                    }
+                }
+
+                typeSelect.addEventListener('change', syncCategoryOptions);
+                syncCategoryOptions();
+            }
+
+            const expenseSkeleton = document.getElementById('expenseBudgetSkeleton');
+            const expenseCardsWrap = document.getElementById('expenseBudgetCards');
+            if (expenseSkeleton && expenseCardsWrap) {
+                window.setTimeout(function () {
+                    expenseSkeleton.style.display = 'none';
+                    expenseCardsWrap.style.display = 'grid';
+                }, 260);
+            }
+
+            const expenseAmount = document.getElementById('expense_amount');
+            const expensePreview = document.getElementById('expensePreview');
+            const expenseWarning = document.getElementById('expenseWarning');
+            const lockedCategory = document.getElementById('expenseLockedCategory');
+            const expenseBudgetRadios = Array.from(document.querySelectorAll('.expense-budget-radio'));
+
+            function updateExpensePreview() {
+                if (!expenseAmount || !expensePreview || expenseBudgetRadios.length === 0) {
+                    return;
+                }
+
+                const selected = expenseBudgetRadios.find((radio) => radio.checked);
+                if (!selected) {
+                    expensePreview.style.display = 'none';
+                    if (expenseWarning) {
+                        expenseWarning.style.display = 'none';
+                    }
+                    if (lockedCategory) {
+                        lockedCategory.textContent = 'Pilih budget dulu';
+                    }
+                    document.querySelectorAll('[data-budget-card]').forEach((card) => card.classList.remove('is-selected'));
+                    return;
+                }
+
+                const selectedCard = selected.closest('[data-budget-card]');
+                document.querySelectorAll('[data-budget-card]').forEach((card) => card.classList.remove('is-selected'));
+                if (selectedCard) {
+                    selectedCard.classList.add('is-selected');
+                }
+
+                const amount = parseFloat(expenseAmount.value || '0');
+                const budgetName = selected.dataset.budgetName || '-';
+                const budgetCategoryLabel = selected.dataset.budgetCategoryLabel || budgetName;
+                const limit = parseFloat(selected.dataset.budgetLimit || '0');
+                const spent = parseFloat(selected.dataset.budgetSpent || '0');
+                const projectedSpent = spent + amount;
+                const projectedPct = limit > 0 ? Math.round((projectedSpent / limit) * 100) : 0;
+                const spentPct = limit > 0 ? Math.round((spent / limit) * 100) : 0;
+                const status = projectedPct > 100 ? 'Exceeded' : (projectedPct >= 80 ? 'Warning' : 'On Track');
+                const remaining = Math.max(0, limit - projectedSpent);
+                const bonusXp = Math.floor(amount / 25000);
+                const baseXp = 10;
+                const totalXp = baseXp + bonusXp;
+
+                if (lockedCategory) {
+                    lockedCategory.textContent = '🔒 ' + budgetCategoryLabel;
+                }
+
+                expensePreview.innerHTML = '<strong>📊 Preview Budget Setelah Transaksi</strong><br>'
+                    + '<br><strong>Budget ' + budgetName + ':</strong>'
+                    + '<br>• Sekarang: Rp ' + spent.toLocaleString('id-ID') + ' (' + spentPct + '%)'
+                    + '<br>• Setelah: Rp ' + projectedSpent.toLocaleString('id-ID') + ' (' + projectedPct + '%)'
+                    + '<br>• Sisa: Rp ' + remaining.toLocaleString('id-ID')
+                    + '<br>• Status: ' + (status === 'Exceeded' ? '🔴 Exceeded' : (status === 'Warning' ? '🟡 Warning' : '🟢 On Track'))
+                    + '<br><br><strong>XP yang Didapat:</strong>'
+                    + '<br>• Base XP: +' + baseXp
+                    + '<br>• Bonus: +' + bonusXp + ' XP'
+                    + '<br>• Total: +' + totalXp + ' XP';
+
+                expensePreview.style.display = 'block';
+                if (expenseWarning) {
+                    expenseWarning.style.display = projectedPct > 100 ? 'block' : 'none';
+                }
+            }
+
+            expenseBudgetRadios.forEach((radio) => {
+                radio.addEventListener('change', updateExpensePreview);
+            });
+
+            if (expenseAmount) {
+                expenseAmount.addEventListener('input', updateExpensePreview);
+            }
+
+            const incomeSkeleton = document.getElementById('incomeGoalSkeleton');
+            const incomeGoalCards = document.getElementById('incomeGoalCards');
+            if (incomeSkeleton && incomeGoalCards) {
+                window.setTimeout(function () {
+                    incomeSkeleton.style.display = 'none';
+                    incomeGoalCards.style.display = 'grid';
+                }, 260);
+            }
+
+            const incomeAmount = document.getElementById('income_amount');
+            const incomeSummary = document.getElementById('incomeSummary');
+            const incomeGoalSelect = document.getElementById('income_goal_id');
+
+            function goalColorByPercentage(percentage) {
+                if (percentage >= 100) return '#4CAF50';
+                if (percentage >= 80) return '#FFA726';
+                if (percentage >= 51) return '#4CAF50';
+                return '#E0E0E0';
+            }
+
+            function updateIncomeSummary() {
+                if (!incomeAmount || !incomeSummary || !incomeGoalSelect) {
+                    return;
+                }
+
+                const total = parseFloat(incomeAmount.value || '0');
+                const selectedOption = incomeGoalSelect.options[incomeGoalSelect.selectedIndex];
+                const goalName = selectedOption ? (selectedOption.dataset.goalName || selectedOption.textContent || 'Goal') : 'Goal';
+                const goalTarget = selectedOption ? parseFloat(selectedOption.dataset.goalTarget || '0') : 0;
+                const goalCurrent = selectedOption ? parseFloat(selectedOption.dataset.goalCurrent || '0') : 0;
+                const goalAfter = goalCurrent + total;
+                const beforePct = goalTarget > 0 ? (goalCurrent / goalTarget) * 100 : 0;
+                const afterPct = goalTarget > 0 ? (goalAfter / goalTarget) * 100 : 0;
+                const achieved = afterPct >= 100;
+                const allocationValid = !!incomeGoalSelect.value;
+
+                const baseXp = Math.max(1, Math.floor(total / 10000));
+                const contributionXp = Math.floor(total / 120000);
+                const achievementXp = achieved ? 100 : 0;
+                const totalXp = baseXp + contributionXp + achievementXp;
+
+                if (total > 0) {
+                    let goalLine = incomeGoalSelect.value
+                        ? '<br>├─ ke Goal "' + goalName + '": Rp ' + total.toLocaleString('id-ID')
+                        : '';
+
+                    let achievementLine = achieved
+                        ? '<br>✓ Goal ACHIEVED! +' + achievementXp + ' XP'
+                        : '<br>✓ Goal belum selesai';
+
+                    incomeSummary.innerHTML = '<strong>📊 Summary Alokasi:</strong><br>Total Income: Rp '
+                        + total.toLocaleString('id-ID')
+                        + goalLine
+                        + '<br><br><strong>🎁 Achievement Check:</strong>'
+                        + '<br>Progress Goal: ' + beforePct.toFixed(2) + '% → ' + afterPct.toFixed(2) + '%'
+                        + achievementLine
+                        + '<br><br><strong>XP yang Didapat:</strong>'
+                        + '<br>• Base XP: +' + baseXp
+                        + '<br>• Goal Contribution: +' + contributionXp
+                        + '<br>• Goal Achievement: +' + achievementXp
+                        + '<br>• Total: +' + totalXp + ' XP'
+                        + (!allocationValid ? '<br><br><span style="color:#b91c1c;font-weight:700;">Pilih goal terlebih dahulu.</span>' : '');
+
+                    incomeSummary.style.borderColor = allocationValid ? '#dbe8f6' : '#fecaca';
+                    incomeSummary.style.background = allocationValid ? '#f9fcff' : '#fff1f2';
+                    incomeSummary.style.display = 'block';
+                } else {
+                    incomeSummary.style.display = 'none';
+                }
+            }
+
+            if (incomeGoalSelect) {
+                incomeGoalSelect.addEventListener('change', updateIncomeSummary);
+            }
+
+            if (incomeAmount) {
+                incomeAmount.addEventListener('input', updateIncomeSummary);
+            }
+
+            updateExpensePreview();
+            updateIncomeSummary();
+        });
+    </script>
 </body>
 </html>
 <?php /**PATH C:\finco\resources\views/dashboard.blade.php ENDPATH**/ ?>
