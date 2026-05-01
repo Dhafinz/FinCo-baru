@@ -1308,7 +1308,7 @@
                                     <a class="{{ $transactionMode === 'general' ? 'active' : '' }}" href="{{ route('dashboard.transactions', ['mode' => 'general']) }}">📝 General</a>
                                     <a class="{{ $transactionMode === 'expense' ? 'active' : '' }}" href="{{ route('dashboard.transactions', ['mode' => 'expense']) }}">💸 Expense</a>
                                     <a class="{{ $transactionMode === 'income' ? 'active' : '' }}" href="{{ route('dashboard.transactions', ['mode' => 'income']) }}">💰 Income</a>
-                                    <a href="{{ route('dashboard.quests') }}">🎯 Quest</a>
+                                    <a href="{{ route('dashboard.challenges') }}">🎯 Quest</a>
                                 </div>
                             </section>
 
@@ -1389,6 +1389,7 @@
                                         <form action="{{ route('dashboard.transactions.store') }}" method="POST" style="margin-top:0.75rem;" id="incomeForm">
                                             @csrf
                                             <input type="hidden" name="type" value="income">
+                                            <input type="hidden" name="mode" value="income">
 
                                             <div class="form-grid">
                                                 <div class="field">

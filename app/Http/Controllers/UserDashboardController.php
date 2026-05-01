@@ -648,6 +648,13 @@ class UserDashboardController extends Controller
         if ($feature === 'budgets') {
             $this->checkAndAwardBudgetBadges($user->id);
         }
+        // Check & award XP/level based badges when visiting badges page
+        if ($feature === 'badges') {
+            $this->checkAndAwardXpBadges($user->id);
+            // refresh badge data after awarding
+            $data['userBadges'] = UserBadge::query()->where('user_id', $user->id)->with('badge')->orderBy('earned_at', 'desc')->get();
+            $data['badgeCatalog'] = $this->badgeCatalogForUser($user->id);
+        }
 
         return view('dashboard', $data);
     }
@@ -1131,6 +1138,38 @@ class UserDashboardController extends Controller
                 'is_completed' => $progress['is_completed'],
             ];
         });
+    }
+
+    /**
+     * Auto-award badges based on current XP/level if criteria met.
+     * Called when rendering badges feature so users with 100% progress get badges.
+     */
+    private function checkAndAwardXpBadges(int $userId): void
+    {
+        if (! Schema::hasTable('badges') || ! Schema::hasTable('user_badges')) {
+            return;
+        }
+
+        $xp = $this->totalXp($userId);
+        $level = $this->currentLevel($userId);
+
+        $eligible = Badge::query()
+            ->where(function ($q) use ($xp, $level) {
+                $q->where('required_xp', '<=', $xp)
+                  ->where('required_level', '<=', $level);
+            })
+            ->get();
+
+        foreach ($eligible as $badge) {
+            $already = UserBadge::query()
+                ->where('user_id', $userId)
+                ->where('badge_id', $badge->id)
+                ->exists();
+
+            if (! $already) {
+                $this->awardBadge($userId, $badge->name);
+            }
+        }
     }
 
     private function calculateQuestProgress(Challenge $challenge, int $userId): array

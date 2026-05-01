@@ -40,8 +40,8 @@ class StoreTransactionRequest extends FormRequest
             ];
         }
 
-        // For income mode with goal allocations
-        if ($this->input('type') === 'income') {
+        // For dedicated income flow (mode=income) require goal selection
+        if ($this->input('mode') === 'income') {
             $rules['goal_id'] = [
                 'required',
                 Rule::exists('financial_goals', 'id')->where(function ($query) {
@@ -76,7 +76,8 @@ class StoreTransactionRequest extends FormRequest
     public function withValidator($validator): void
     {
         $validator->after(function ($validator) {
-            if ($this->input('type') !== 'income') {
+            // only validate allocations/goal when in dedicated income mode
+            if ($this->input('mode') !== 'income') {
                 return;
             }
 

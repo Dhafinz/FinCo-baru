@@ -1308,7 +1308,7 @@
                                     <a class="<?php echo e($transactionMode === 'general' ? 'active' : ''); ?>" href="<?php echo e(route('dashboard.transactions', ['mode' => 'general'])); ?>">📝 General</a>
                                     <a class="<?php echo e($transactionMode === 'expense' ? 'active' : ''); ?>" href="<?php echo e(route('dashboard.transactions', ['mode' => 'expense'])); ?>">💸 Expense</a>
                                     <a class="<?php echo e($transactionMode === 'income' ? 'active' : ''); ?>" href="<?php echo e(route('dashboard.transactions', ['mode' => 'income'])); ?>">💰 Income</a>
-                                    <a href="<?php echo e(route('dashboard.quests')); ?>">🎯 Quest</a>
+                                    <a href="<?php echo e(route('dashboard.challenges')); ?>">🎯 Quest</a>
                                 </div>
                             </section>
 
@@ -1389,6 +1389,7 @@
                                         <form action="<?php echo e(route('dashboard.transactions.store')); ?>" method="POST" style="margin-top:0.75rem;" id="incomeForm">
                                             <?php echo csrf_field(); ?>
                                             <input type="hidden" name="type" value="income">
+                                            <input type="hidden" name="mode" value="income">
 
                                             <div class="form-grid">
                                                 <div class="field">
