@@ -1287,15 +1287,18 @@
                                 $transactionModeLabel = match ($transactionMode) {
                                     'expense' => 'Bayar / Expense',
                                     'income' => 'Terima / Income',
+                                    'quest' => 'Selesaikan Quest',
                                     default => 'Catat Transaksi',
                                 };
                                 $transactionModeCopy = match ($transactionMode) {
                                     'expense' => 'Pilih budget aktif yang relevan, lalu catat pengeluaran agar budget auto-ter-update.',
                                     'income' => 'Catat pemasukan dan lihat kategori income yang paling sesuai.',
+                                    'quest' => 'Pilih quest, lalu selesaikan lewat transaksi yang sudah dikunci sesuai tipe quest.',
                                     default => 'Pilih tipe transaksi dulu, lalu kategori akan mengikuti tipe yang dipilih.',
                                 };
                                 $selectedType = old('type', $transactionMode === 'expense' ? 'expense' : ($transactionMode === 'income' ? 'income' : ''));
                                 $categoryCollection = ($categoryOptions ?? collect())->values();
+                                $selectedQuestTemplate = $questSelectedTemplate ?? null;
                             @endphp
 
                             <section class="mode-banner card">
@@ -1308,7 +1311,7 @@
                                     <a class="{{ $transactionMode === 'general' ? 'active' : '' }}" href="{{ route('dashboard.transactions', ['mode' => 'general']) }}">📝 General</a>
                                     <a class="{{ $transactionMode === 'expense' ? 'active' : '' }}" href="{{ route('dashboard.transactions', ['mode' => 'expense']) }}">💸 Expense</a>
                                     <a class="{{ $transactionMode === 'income' ? 'active' : '' }}" href="{{ route('dashboard.transactions', ['mode' => 'income']) }}">💰 Income</a>
-                                    <a href="{{ route('dashboard.challenges') }}">🎯 Quest</a>
+                                    <a class="{{ $transactionMode === 'quest' ? 'active' : '' }}" href="{{ route('dashboard.quests', ['mode' => 'select']) }}">🎯 Quest</a>
                                 </div>
                             </section>
 
@@ -1448,6 +1451,77 @@
                                                 <a href="{{ route('dashboard.transactions', ['mode' => 'general']) }}" class="btn btn-soft" style="text-decoration:none;display:inline-flex;align-items:center;">Batal</a>
                                             </div>
                                         </form>
+                                    @elseif ($transactionMode === 'quest')
+                                        <form action="{{ route('dashboard.transactions.store') }}" method="POST" style="margin-top:0.75rem;" id="questForm">
+                                            @csrf
+                                            <input type="hidden" name="mode" value="quest">
+                                            <input type="hidden" name="quest_key" value="{{ $questSelectedKey ?? '' }}">
+
+                                            <div class="field" style="margin-bottom:0.7rem;">
+                                                <label>🎯 Quest Terpilih</label>
+                                                @if ($selectedQuestTemplate)
+                                                    @php
+                                                        $questFlow = $selectedQuestTemplate['flow'] ?? 'both';
+                                                        $questFlowLabel = $questFlow === 'income' ? 'Income' : ($questFlow === 'expense' ? 'Expense' : 'General');
+                                                    @endphp
+                                                    <div class="locked-category">{{ $selectedQuestTemplate['name'] }} • Tipe: {{ $questFlowLabel }}</div>
+                                                    <small style="display:block;color:var(--muted);margin-top:0.16rem;">Reward +{{ $selectedQuestTemplate['reward_xp'] }} XP • {{ $selectedQuestTemplate['description'] }}</small>
+                                                @else
+                                                    <div class="placeholder">Quest belum dipilih. Kembali ke halaman quest untuk memilih quest dulu.</div>
+                                                @endif
+                                            </div>
+
+                                            <div class="form-grid">
+                                                <div class="field">
+                                                    <label>Tipe (Auto dari Quest) 🔒</label>
+                                                    <div class="locked-category" id="questLockedType">{{ $selectedQuestTemplate ? (($selectedQuestTemplate['flow'] ?? 'income') === 'expense' ? 'Expense' : 'Income') : 'Pilih quest dulu' }}</div>
+                                                </div>
+                                                <div class="field">
+                                                    <label for="quest_amount">Amount (Rp)</label>
+                                                    <input id="quest_amount" type="number" min="0" step="0.01" name="amount" value="{{ old('amount') }}" required {{ $selectedQuestTemplate ? '' : 'disabled' }}>
+                                                </div>
+                                                <div class="field">
+                                                    <label for="quest_category">Kategori</label>
+                                                    <select id="quest_category" name="category_id" required {{ $selectedQuestTemplate ? '' : 'disabled' }}>
+                                                        <option value="">Pilih kategori</option>
+                                                        @foreach ($categoryCollection as $category)
+                                                            @if (($selectedQuestTemplate && ($selectedQuestTemplate['flow'] ?? 'income') === 'expense' && $category->type === 'expense') || ($selectedQuestTemplate && ($selectedQuestTemplate['flow'] ?? 'income') === 'income' && $category->type === 'income'))
+                                                                <option value="{{ $category->id }}" {{ (string) old('category_id') === (string) $category->id ? 'selected' : '' }}>{{ $category->name }}</option>
+                                                            @endif
+                                                        @endforeach
+                                                    </select>
+                                                </div>
+                                                <div class="field">
+                                                    <label for="quest_date">Tanggal</label>
+                                                    <input id="quest_date" type="date" name="transaction_date" value="{{ old('transaction_date', now()->toDateString()) }}" required {{ $selectedQuestTemplate ? '' : 'disabled' }}>
+                                                </div>
+                                                <div class="field field-2">
+                                                    <label for="quest_desc">Deskripsi</label>
+                                                    <input id="quest_desc" type="text" name="description" maxlength="255" value="{{ old('description') }}" placeholder="Contoh: Nabung bulan ini" {{ $selectedQuestTemplate ? '' : 'disabled' }}>
+                                                </div>
+                                            </div>
+
+                                                <div id="questPreview" class="preview-card"
+                                                    data-quest-flow="{{ $selectedQuestTemplate['flow'] ?? 'income' }}"
+                                                    data-quest-target="{{ (float) ($selectedQuestTemplate['criteria']['target'] ?? 0) }}"
+                                                    data-quest-name="{{ $selectedQuestTemplate['name'] ?? '' }}"
+                                                    data-quest-current="0"
+                                                    style="display:{{ $selectedQuestTemplate ? 'block' : 'none' }};">
+                                                    @if ($selectedQuestTemplate)
+                                                        <strong>📊 Quest Progress Preview</strong><br>
+                                                        Quest: {{ $selectedQuestTemplate['name'] }}<br>
+                                                        • Current: Rp 0<br>
+                                                        • This transaction: Rp 0<br>
+                                                        • After: Rp 0<br>
+                                                        • Remaining: Rp {{ number_format((float) ($selectedQuestTemplate['criteria']['target'] ?? 0), 0, ',', '.') }}
+                                                    @endif
+                                                </div>
+
+                                            <div class="row-actions">
+                                                <button type="submit" class="btn btn-primary" {{ $selectedQuestTemplate ? '' : 'disabled' }}>💾 Selesaikan Quest</button>
+                                                <a href="{{ route('dashboard.quests', ['mode' => 'select']) }}" class="btn btn-soft" style="text-decoration:none;display:inline-flex;align-items:center;">Pilih Quest</a>
+                                            </div>
+                                        </form>
                                     @else
                                         <form action="{{ route('dashboard.transactions.store') }}" method="POST" style="margin-top:0.75rem;" id="transactionQuickForm">
                                             @csrf
@@ -1496,6 +1570,10 @@
                                         <div class="context-card">
                                             <h3>Preview Budget</h3>
                                             <p>Pilih budget, isi nominal, dan preview akan update real-time termasuk before/after serta estimasi XP.</p>
+                                    @elseif ($transactionMode === 'quest')
+                                        <div class="context-card">
+                                            <h3>Quest Preview</h3>
+                                            <p>Pilih quest dari halaman quest, lalu transaksi akan dikunci agar sesuai dengan tipe quest tersebut.</p>
                                         </div>
                                     @elseif ($transactionMode === 'income')
                                         <div class="context-card">
@@ -1897,50 +1975,17 @@
                             </section>
 
                             <section class="card transaction-create">
-                                <h2>Tambah Challenge</h2>
-                                <p style="margin-top:0.2rem;color:var(--muted);font-size:0.84rem;">Buat challenge baru untuk melatih disiplin finansial.</p>
-                                <form action="{{ route('dashboard.challenges.store') }}" method="POST" style="margin-top:0.75rem;">
-                                    @csrf
-                                    <div class="form-grid">
-                                        <div class="field field-2">
-                                            <label for="chal_name">Nama Challenge</label>
-                                            <input id="chal_name" type="text" name="name" maxlength="100" value="{{ old('name') }}" placeholder="Contoh: 30 Days No Spending" required>
-                                        </div>
-                                        <div class="field">
-                                            <label for="chal_difficulty">Difficulty</label>
-                                            <select id="chal_difficulty" name="difficulty" required>
-                                                <option value="easy">Easy</option>
-                                                <option value="medium" selected>Medium</option>
-                                                <option value="hard">Hard</option>
-                                            </select>
-                                        </div>
-                                        <div class="field">
-                                            <label for="chal_xp">XP Reward</label>
-                                            <input id="chal_xp" type="number" min="10" step="10" name="reward_xp" value="{{ old('reward_xp', 100) }}" required>
-                                        </div>
-                                        <div class="field">
-                                            <label for="chal_start">Tanggal Mulai</label>
-                                            <input id="chal_start" type="date" name="start_date" value="{{ old('start_date', now()->toDateString()) }}" required>
-                                        </div>
-                                        <div class="field">
-                                            <label for="chal_end">Tanggal Akhir</label>
-                                            <input id="chal_end" type="date" name="end_date" value="{{ old('end_date', now()->addDays(30)->toDateString()) }}" required>
-                                        </div>
-                                        <div class="field field-2">
-                                            <label for="chal_desc">Deskripsi</label>
-                                            <input id="chal_desc" type="text" name="description" maxlength="255" value="{{ old('description') }}" placeholder="Deskripsi challenge & kriteria">
-                                        </div>
-                                    </div>
-                                    <div class="row-actions">
-                                        <button type="submit" class="btn btn-primary">Simpan Challenge</button>
-                                    </div>
-                                </form>
+                                <h2>Challenge Auto-Tracking</h2>
+                                <p style="margin-top:0.2rem;color:var(--muted);font-size:0.84rem;">Challenge sekarang hanya dipantau otomatis dari transaksi. Fitur create/edit akan dipindah ke admin nanti.</p>
+                                <div class="placeholder" style="margin-top:0.75rem;">
+                                    Fokus challenge: transaksi apapun akan memperbarui progress secara otomatis. Tidak perlu pilih saat transaksi.
+                                </div>
                             </section>
 
                             <section class="layout">
                                 <article class="card panel" style="grid-column: 1 / -1;">
                                     <h2>Daftar Challenge</h2>
-                                    <p>Challenge yang sedang berjalan atau sudah diselesaikan.</p>
+                                    <p>Challenge yang sedang berjalan atau sudah diselesaikan. Progress diperbarui otomatis dari aktivitas transaksi.</p>
                                     <div class="transaction-list">
                                         @forelse ($challenges ?? collect() as $challenge)
                                             <div class="item">
@@ -1949,70 +1994,15 @@
                                                     <p>Periode: {{ \Illuminate\Support\Carbon::parse($challenge->start_date)->format('d M') }} - {{ \Illuminate\Support\Carbon::parse($challenge->end_date)->format('d M Y') }} • Reward: +{{ $challenge->reward_xp }} XP</p>
                                                     <p style="margin-top:0.3rem;font-size:0.82rem;">Status: {{ ucfirst($challenge->status) }} • Sisa {{ $challenge->daysRemaining() ?? 0 }} hari</p>
 
-                                                    @if (($editingChallengeId ?? 0) === $challenge->id)
-                                                        <form action="{{ route('dashboard.challenges.update', $challenge) }}" method="POST" style="margin-top:0.7rem;">
-                                                            @csrf
-                                                            @method('PUT')
-                                                            <div class="form-grid">
-                                                                <div class="field field-2">
-                                                                    <label>Nama</label>
-                                                                    <input type="text" name="name" maxlength="100" value="{{ $challenge->name }}" required>
-                                                                </div>
-                                                                <div class="field">
-                                                                    <label>Difficulty</label>
-                                                                    <select name="difficulty" required>
-                                                                        <option value="easy" {{ $challenge->difficulty === 'easy' ? 'selected' : '' }}>Easy</option>
-                                                                        <option value="medium" {{ $challenge->difficulty === 'medium' ? 'selected' : '' }}>Medium</option>
-                                                                        <option value="hard" {{ $challenge->difficulty === 'hard' ? 'selected' : '' }}>Hard</option>
-                                                                    </select>
-                                                                </div>
-                                                                <div class="field">
-                                                                    <label>XP Reward</label>
-                                                                    <input type="number" min="10" step="10" name="reward_xp" value="{{ (int) $challenge->reward_xp }}" required>
-                                                                </div>
-                                                                <div class="field">
-                                                                    <label>Tanggal Mulai</label>
-                                                                    <input type="date" name="start_date" value="{{ optional($challenge->start_date)->format('Y-m-d') }}" required>
-                                                                </div>
-                                                                <div class="field">
-                                                                    <label>Tanggal Akhir</label>
-                                                                    <input type="date" name="end_date" value="{{ optional($challenge->end_date)->format('Y-m-d') }}" required>
-                                                                </div>
-                                                                <div class="field">
-                                                                    <label>Status</label>
-                                                                    <select name="status" required>
-                                                                        <option value="active" {{ $challenge->status === 'active' ? 'selected' : '' }}>Active</option>
-                                                                        <option value="completed" {{ $challenge->status === 'completed' ? 'selected' : '' }}>Completed</option>
-                                                                        <option value="failed" {{ $challenge->status === 'failed' ? 'selected' : '' }}>Failed</option>
-                                                                    </select>
-                                                                </div>
-                                                                <div class="field field-2">
-                                                                    <label>Deskripsi</label>
-                                                                    <input type="text" name="description" maxlength="255" value="{{ $challenge->description }}">
-                                                                </div>
-                                                            </div>
-                                                            <div class="row-actions">
-                                                                <button type="submit" class="btn btn-primary">Update</button>
-                                                                <a href="{{ route('dashboard.challenges') }}" class="btn btn-soft" style="text-decoration:none;display:inline-flex;align-items:center;">Batal</a>
-                                                            </div>
-                                                        </form>
-                                                    @endif
                                                 </div>
                                                 <div style="text-align:right; min-width: 165px;">
                                                     <span class="badge" style="background: {{ $challenge->difficulty === 'easy' ? '#dcfce7' : ($challenge->difficulty === 'hard' ? '#fee2e2' : '#dbeafe') }}; color: {{ $challenge->difficulty === 'easy' ? '#166534' : ($challenge->difficulty === 'hard' ? '#991b1b' : '#1e3a8a') }};">{{ ucfirst($challenge->difficulty) }}</span>
                                                     <div style="margin-top:0.25rem;font-weight:700;color:#1f3b63;">+{{ $challenge->reward_xp }} XP</div>
-                                                    <div class="row-actions" style="justify-content:flex-end;">
-                                                        <a href="{{ route('dashboard.challenges', ['edit' => $challenge->id]) }}" class="btn btn-soft" style="text-decoration:none;display:inline-flex;align-items:center;">Edit</a>
-                                                        <form action="{{ route('dashboard.challenges.destroy', $challenge) }}" method="POST" onsubmit="return confirm('Hapus challenge ini?')">
-                                                            @csrf
-                                                            @method('DELETE')
-                                                            <button type="submit" class="btn btn-danger">Hapus</button>
-                                                        </form>
-                                                    </div>
+                                                    <div style="margin-top:0.35rem;font-size:0.78rem;color:var(--muted);">Auto-tracking</div>
                                                 </div>
                                             </div>
                                         @empty
-                                            <div class="placeholder">Belum ada challenge. Mulai dengan membuat challenge pertama untuk latih disiplin finansial.</div>
+                                            <div class="placeholder">Belum ada challenge aktif. Nanti admin yang akan menambah challenge untuk user.</div>
                                         @endforelse
                                     </div>
                                 </article>
@@ -2032,7 +2022,7 @@
                             <section class="layout">
                                 <article class="card panel" style="grid-column: 1 / -1;">
                                     <h2>🔥 Quest Aktif Kamu</h2>
-                                    <p>Progress quest aktif akan diperbarui otomatis setiap transaksi baru.</p>
+                                    <p>Progress quest aktif akan diperbarui otomatis setiap transaksi quest.</p>
                                     <div class="quest-list">
                                         @forelse (($questActiveCards ?? collect()) as $quest)
                                             <div class="quest-card">
@@ -2048,19 +2038,49 @@
                                 </article>
 
                                 <article class="card panel" style="grid-column: 1 / -1;">
+                                    <h2>✅ Quest Selesai</h2>
+                                    <p>Quest yang sudah selesai dan bonus XP yang sudah masuk ke akunmu.</p>
+                                    <div class="quest-list">
+                                        @forelse (($questCompletedCards ?? collect()) as $quest)
+                                            <div class="quest-card" style="border-color:#86efac;background:#f0fdf4;">
+                                                <h3>{{ $quest['name'] }}</h3>
+                                                <p>{{ $quest['label'] }}</p>
+                                                <div class="quest-progress"><span style="width: 100%; background: #16a34a;"></span></div>
+                                                <p style="margin-top:0.35rem;font-size:0.8rem;color:var(--muted);">Reward: +{{ $quest['reward_xp'] }} XP • Status: ✅ Completed</p>
+                                            </div>
+                                        @empty
+                                            <div class="placeholder">Belum ada quest yang selesai.</div>
+                                        @endforelse
+                                    </div>
+                                </article>
+
+                                @if (($questMode ?? null) === 'select')
+                                    <article class="card panel" style="grid-column: 1 / -1;">
+                                        <h2>Pilih Tipe Quest</h2>
+                                        <p>Pilih apakah kamu ingin quest berbasis <strong>income</strong> (nabung) atau <strong>expense</strong> (hemat).</p>
+                                        <div style="margin-top:0.6rem;display:flex;gap:0.5rem;flex-wrap:wrap;">
+                                            <a href="{{ route('dashboard.quests', ['flow' => 'income']) }}" class="btn btn-primary">Income (Nabung)</a>
+                                            <a href="{{ route('dashboard.quests', ['flow' => 'expense']) }}" class="btn btn-soft">Expense (Hemat)</a>
+                                            <a href="{{ route('dashboard.quests') }}" class="btn btn-soft">Tampilkan Semua</a>
+                                        </div>
+                                    </article>
+                                @endif
+
+                                <article class="card panel" style="grid-column: 1 / -1;">
                                     <h2>📜 Quest Tersedia</h2>
-                                    <p>Pilih quest yang ingin diikuti sekarang.</p>
+                                    <p>Pilih quest yang ingin diselesaikan lewat transaksi.</p>
                                     <div class="quest-list">
                                         @forelse (($questAvailableTemplates ?? collect()) as $questTpl)
                                             <div class="quest-card">
                                                 <h3>{{ $questTpl['name'] }}</h3>
                                                 <p>{{ $questTpl['description'] }}</p>
-                                                <p style="margin-top:0.35rem;font-size:0.8rem;color:var(--muted);">Reward: +{{ $questTpl['reward_xp'] }} XP • Difficulty: {{ ucfirst($questTpl['difficulty']) }} • Durasi: {{ $questTpl['duration_days'] }} hari</p>
-                                                <form action="{{ route('dashboard.quests.join') }}" method="POST" style="margin-top:0.55rem;">
-                                                    @csrf
-                                                    <input type="hidden" name="quest_key" value="{{ $questTpl['key'] }}">
-                                                    <button class="btn btn-soft" type="submit">✨ Join Quest</button>
-                                                </form>
+                                                @php
+                                                    $questFlowLabel = ($questTpl['flow'] ?? 'both') === 'income' ? 'Income' : (($questTpl['flow'] ?? 'both') === 'expense' ? 'Expense' : 'General');
+                                                @endphp
+                                                <p style="margin-top:0.35rem;font-size:0.8rem;color:var(--muted);">Reward: +{{ $questTpl['reward_xp'] }} XP • Tipe: {{ $questFlowLabel }} • Durasi: {{ $questTpl['duration_days'] }} hari</p>
+                                                <div class="row-actions" style="margin-top:0.55rem;">
+                                                    <a href="{{ route('dashboard.transactions', ['mode' => 'quest', 'quest_key' => $questTpl['key']]) }}" class="btn btn-soft" style="text-decoration:none;display:inline-flex;align-items:center;">Pilih Quest</a>
+                                                </div>
                                             </div>
                                         @empty
                                             <div class="placeholder">Semua quest sedang aktif atau belum ada template quest.</div>
@@ -2386,6 +2406,8 @@
             const incomeAmount = document.getElementById('income_amount');
             const incomeSummary = document.getElementById('incomeSummary');
             const incomeGoalSelect = document.getElementById('income_goal_id');
+            const questAmount = document.getElementById('quest_amount');
+            const questPreview = document.getElementById('questPreview');
 
             function goalColorByPercentage(percentage) {
                 if (percentage >= 100) return '#4CAF50';
@@ -2453,8 +2475,47 @@
                 incomeAmount.addEventListener('input', updateIncomeSummary);
             }
 
+            function updateQuestPreview() {
+                if (!questAmount || !questPreview) {
+                    return;
+                }
+
+                const target = parseFloat(questPreview.dataset.questTarget || '0');
+                const current = parseFloat(questPreview.dataset.questCurrent || '0');
+                const selectedFlow = questPreview.dataset.questFlow || 'income';
+                const selectedName = questPreview.dataset.questName || 'Quest';
+                const amount = parseFloat(questAmount.value || '0');
+                const after = current + amount;
+                const progressPct = target > 0 ? Math.min(100, Math.round((after / target) * 100)) : 0;
+                const remaining = Math.max(0, target - after);
+                const baseXp = Math.max(1, Math.floor(amount / 10000));
+                const questXp = Math.max(1, Math.floor(target / 100000));
+
+                if (amount > 0) {
+                    questPreview.innerHTML = '<strong>📊 Quest Progress Preview</strong><br>'
+                        + 'Quest: ' + selectedName
+                        + '<br>• Tipe: ' + (selectedFlow === 'expense' ? 'Expense' : 'Income')
+                        + '<br>• Current: Rp ' + current.toLocaleString('id-ID')
+                        + '<br>• This transaction: Rp ' + amount.toLocaleString('id-ID')
+                        + '<br>• After: Rp ' + after.toLocaleString('id-ID') + ' (' + progressPct + '%)'
+                        + '<br>• Remaining: Rp ' + remaining.toLocaleString('id-ID')
+                        + '<br><br><strong>XP yang Didapat:</strong>'
+                        + '<br>• Base XP: +' + baseXp
+                        + '<br>• Quest XP: +' + questXp
+                        + '<br>• Total: +' + (baseXp + questXp) + ' XP';
+                    questPreview.style.display = 'block';
+                } else {
+                    questPreview.style.display = 'block';
+                }
+            }
+
+            if (questAmount) {
+                questAmount.addEventListener('input', updateQuestPreview);
+            }
+
             updateExpensePreview();
             updateIncomeSummary();
+            updateQuestPreview();
         });
     </script>
 </body>

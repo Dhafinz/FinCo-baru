@@ -19,6 +19,8 @@ class StoreTransactionRequest extends FormRequest
             'amount' => 'required|numeric|min:0.01',
             'description' => 'nullable|string|max:500',
             'transaction_date' => 'required|date|before_or_equal:today',
+            'mode' => 'nullable|in:general,expense,income,quest',
+            'quest_key' => 'nullable|string',
         ];
 
         // For expense mode with budget selection
@@ -48,6 +50,10 @@ class StoreTransactionRequest extends FormRequest
                     return $query->where('user_id', $this->user()->id)->where('status', 'active');
                 }),
             ];
+        }
+
+        if ($this->input('mode') === 'quest') {
+            $rules['quest_key'] = ['required', 'string'];
         }
 
         return $rules;

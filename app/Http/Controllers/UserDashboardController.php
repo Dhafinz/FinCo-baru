@@ -49,32 +49,31 @@ class UserDashboardController extends Controller
         return $this->renderFeature($request, 'quests', 'Quest Harian');
     }
 
-    public function joinQuest(Request $request)
+    private function questTemplateByKey(string $key): ?array
     {
-        $validated = $request->validate([
-            'quest_key' => ['required', 'string'],
-        ]);
+        return collect($this->questTemplates())
+            ->firstWhere('key', $key);
+    }
 
-        $templates = collect($this->questTemplates());
-        $template = $templates->firstWhere('key', $validated['quest_key']);
-
-        if (! $template) {
-            return redirect()->route('dashboard.quests')->with('error', 'Quest tidak ditemukan.');
-        }
-
-        $userId = $request->user()->id;
-
-        $alreadyActive = Challenge::query()
+    private function activateQuestTemplate(int $userId, array $template): Challenge
+    {
+        $existing = Challenge::query()
             ->where('user_id', $userId)
             ->where('name', $template['name'])
             ->where('status', 'active')
-            ->exists();
+            ->first();
 
-        if ($alreadyActive) {
-            return redirect()->route('dashboard.quests')->with('error', 'Quest ini sudah aktif.');
+        if ($existing) {
+            return $existing;
         }
 
-        Challenge::query()->create([
+        $criteria = $template['criteria'] ?? [];
+        if (! is_array($criteria)) {
+            $criteria = [];
+        }
+        $criteria['flow'] = $template['flow'] ?? 'both';
+
+        return Challenge::query()->create([
             'user_id' => $userId,
             'name' => $template['name'],
             'description' => $template['description'],
@@ -84,8 +83,25 @@ class UserDashboardController extends Controller
             'end_date' => now()->addDays($template['duration_days'])->toDateString(),
             'status' => 'active',
             'category' => 'quest',
-            'criteria' => json_encode($template['criteria']),
+            'criteria' => json_encode($criteria),
         ]);
+    }
+
+    public function joinQuest(Request $request)
+    {
+        $validated = $request->validate([
+            'quest_key' => ['required', 'string'],
+        ]);
+
+        $template = $this->questTemplateByKey($validated['quest_key']);
+
+        if (! $template) {
+            return redirect()->route('dashboard.quests')->with('error', 'Quest tidak ditemukan.');
+        }
+
+        $userId = $request->user()->id;
+
+        $this->activateQuestTemplate($userId, $template);
 
         return redirect()->route('dashboard.quests')->with('success', 'Quest berhasil di-join.');
     }
@@ -119,6 +135,57 @@ class UserDashboardController extends Controller
 
         $validated = $request->validated();
         $userId = $request->user()->id;
+
+        $questTemplate = null;
+        if (($validated['mode'] ?? null) === 'quest') {
+            $questTemplate = $this->questTemplateByKey((string) ($validated['quest_key'] ?? ''));
+
+            if (! $questTemplate) {
+                return redirect()->route('dashboard.quests', ['mode' => 'select'])
+                    ->with('error', 'Quest tidak ditemukan.');
+            }
+
+            $this->activateQuestTemplate($userId, $questTemplate);
+        }
+
+        // Handle Quest Mode (transaction-based quest completion)
+        if (($validated['mode'] ?? null) === 'quest') {
+            $questType = (string) ($questTemplate['flow'] ?? 'income');
+            $validated['type'] = $questType === 'expense' ? 'expense' : 'income';
+
+            if ($questType === 'expense') {
+                $validated['budget_id'] = $validated['budget_id'] ?? null;
+            }
+
+            $categoryId = $this->hasCategoryColumns() ? ($validated['category_id'] ?? null) : null;
+
+            if ($categoryId !== null && ! Category::query()->whereKey($categoryId)->exists()) {
+                return redirect()->route('dashboard.quests', ['mode' => 'select'])
+                    ->with('error', 'Kategori tidak ditemukan.');
+            }
+
+            $xpEarned = $this->calculateXp($validated['type'], (float) $validated['amount']);
+
+            $transaction = Transaction::query()->create([
+                'user_id' => $userId,
+                'category_id' => $categoryId,
+                'type' => $validated['type'],
+                'amount' => $validated['amount'],
+                'description' => $validated['description'] ?? null,
+                'transaction_date' => $validated['transaction_date'],
+                'xp_earned' => $xpEarned,
+            ]);
+
+            $this->applyXpDelta($userId, $xpEarned);
+
+            $message = 'Quest transaction berhasil dicatat.';
+            $questResult = $this->syncQuestProgressFromTransaction($userId, (string) $validated['transaction_date']);
+            if ($questResult['completed_count'] > 0) {
+                $message .= ' 🎯 ' . $questResult['completed_count'] . ' quest selesai! +' . $questResult['xp_rewarded'] . ' XP';
+            }
+
+            return redirect()->route('dashboard.quests')->with('success', $message);
+        }
 
         // Handle Expense Mode (Budget-based)
         if ($validated['type'] === 'expense' && isset($validated['budget_id'])) {
@@ -642,7 +709,12 @@ class UserDashboardController extends Controller
         $data['leaderboardViewerId'] = $user->id;
         $data['badgeCatalog'] = $this->badgeCatalogForUser($user->id);
         $data['questActiveCards'] = $this->activeQuestCards($user->id);
-        $data['questAvailableTemplates'] = $this->availableQuestTemplates($user->id);
+        $data['questCompletedCards'] = $this->questCardsByStatus($user->id, 'completed');
+        $data['questMode'] = $request->query('mode', null);
+        $data['questFlow'] = $request->query('flow', null);
+        $data['questAvailableTemplates'] = $this->availableQuestTemplates($user->id, $data['questFlow']);
+        $data['questSelectedKey'] = $request->query('quest_key', null);
+        $data['questSelectedTemplate'] = $data['questSelectedKey'] ? $this->questTemplateByKey((string) $data['questSelectedKey']) : null;
 
         // Check & award budget badges saat budget page di-render
         if ($feature === 'budgets') {
@@ -1068,53 +1140,55 @@ class UserDashboardController extends Controller
     {
         return [
             [
-                'key' => 'tx_10',
-                'name' => 'Catat 10 Transaksi',
-                'description' => 'Catat 10 transaksi selama periode quest.',
+                'key' => 'save_300k',
+                'name' => 'Nabung Rp 300.000',
+                'description' => 'Tambahkan pemasukan sampai mencapai target nabung selama periode quest.',
+                'difficulty' => 'medium',
+                'reward_xp' => 75,
+                'duration_days' => 14,
+                'flow' => 'income',
+                'criteria' => ['type' => 'income_total', 'target' => 300000, 'unit' => 'rupiah'],
+            ],
+            [
+                'key' => 'save_200k',
+                'name' => 'Hemat Rp 200.000',
+                'description' => 'Kendalikan pengeluaran agar total expense tetap sesuai target hemat quest.',
                 'difficulty' => 'easy',
                 'reward_xp' => 50,
                 'duration_days' => 7,
-                'criteria' => ['type' => 'transaction_count', 'target' => 10, 'unit' => 'transaksi'],
-            ],
-            [
-                'key' => 'save_500k',
-                'name' => 'Hemat Rp 500.000',
-                'description' => 'Capai selisih income - expense sebesar Rp 500.000 selama periode quest.',
-                'difficulty' => 'medium',
-                'reward_xp' => 100,
-                'duration_days' => 14,
-                'criteria' => ['type' => 'savings_target', 'target' => 500000, 'unit' => 'rupiah'],
-            ],
-            [
-                'key' => 'no_spend_30',
-                'name' => '30 Days No Spending',
-                'description' => 'Lewati 30 hari dengan disiplin pengeluaran minimum.',
-                'difficulty' => 'hard',
-                'reward_xp' => 200,
-                'duration_days' => 30,
-                'criteria' => ['type' => 'no_spend_days', 'target' => 30, 'unit' => 'hari'],
+                'flow' => 'expense',
+                'criteria' => ['type' => 'expense_total', 'target' => 200000, 'unit' => 'rupiah'],
             ],
         ];
     }
 
-    private function availableQuestTemplates(int $userId): Collection
+    private function availableQuestTemplates(int $userId, ?string $flow = null): Collection
     {
         $activeNames = Challenge::query()
             ->where('user_id', $userId)
             ->where('status', 'active')
             ->pluck('name')
             ->all();
+        $templates = collect($this->questTemplates())
+            ->reject(fn (array $template) => in_array($template['name'], $activeNames, true));
 
-        return collect($this->questTemplates())
-            ->reject(fn (array $template) => in_array($template['name'], $activeNames, true))
-            ->values();
+        if ($flow && in_array($flow, ['income', 'expense', 'both'], true)) {
+            $templates = $templates->filter(fn (array $t) => ($t['flow'] ?? 'both') === 'both' || ($t['flow'] ?? '') === $flow);
+        }
+
+        return $templates->values();
     }
 
     private function activeQuestCards(int $userId): Collection
     {
+        return $this->questCardsByStatus($userId, 'active');
+    }
+
+    private function questCardsByStatus(int $userId, string $status): Collection
+    {
         $active = Challenge::query()
             ->where('user_id', $userId)
-            ->where('status', 'active')
+            ->where('status', $status)
             ->orderBy('end_date')
             ->get();
 
@@ -1186,20 +1260,23 @@ class UserDashboardController extends Controller
         $current = 0.0;
         $label = '0 / ' . (int) $target;
 
-        if ($type === 'savings_target') {
+        if ($type === 'income_total') {
             $income = (float) Transaction::query()
                 ->where('user_id', $userId)
                 ->where('type', 'income')
                 ->whereBetween('transaction_date', [$startDate, $endDate])
                 ->sum('amount');
 
+            $current = $income;
+            $label = 'Rp ' . number_format($current, 0, ',', '.') . ' / Rp ' . number_format($target, 0, ',', '.');
+        } elseif ($type === 'expense_total') {
             $expense = (float) Transaction::query()
                 ->where('user_id', $userId)
                 ->where('type', 'expense')
                 ->whereBetween('transaction_date', [$startDate, $endDate])
                 ->sum('amount');
 
-            $current = max(0.0, $income - $expense);
+            $current = $expense;
             $label = 'Rp ' . number_format($current, 0, ',', '.') . ' / Rp ' . number_format($target, 0, ',', '.');
         } elseif ($type === 'no_spend_days') {
             $totalDays = max(1, Carbon::parse($startDate)->diffInDays(min(Carbon::today(), Carbon::parse($endDate))) + 1);
@@ -1215,10 +1292,11 @@ class UserDashboardController extends Controller
             $current = max(0, $totalDays - $expenseDays);
             $label = (int) $current . ' / ' . (int) $target . ' hari';
         } else {
-            $current = (float) Transaction::query()
+            $query = Transaction::query()
                 ->where('user_id', $userId)
-                ->whereBetween('transaction_date', [$startDate, $endDate])
-                ->count();
+                ->whereBetween('transaction_date', [$startDate, $endDate]);
+
+            $current = (float) $query->count();
             $label = (int) $current . ' / ' . (int) $target . ' transaksi';
         }
 
