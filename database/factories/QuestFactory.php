@@ -6,9 +6,9 @@ use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
- * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\Challenge>
+ * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\Quest>
  */
-class ChallengeFactory extends Factory
+class QuestFactory extends Factory
 {
     /**
      * Define the model's default state.
@@ -28,8 +28,13 @@ class ChallengeFactory extends Factory
             'start_date' => $startDate,
             'end_date' => $this->faker->dateTimeBetween($startDate, '+30 days'),
             'status' => 'active',
-            'category' => $this->faker->randomElement(['spending_control', 'no_spend', 'savings', 'investment']),
-            'criteria' => $this->faker->sentence(5),
+            'category' => $this->faker->randomElement(['manual', 'auto']),
+            'criteria' => [
+                'template_key' => $this->faker->slug(),
+                'mode' => 'auto',
+                'tracking' => 'transaction_count',
+                'target' => $this->faker->numberBetween(5, 20),
+            ],
         ];
     }
 }

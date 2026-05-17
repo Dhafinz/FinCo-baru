@@ -5,7 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Category;
 use App\Models\Transaction;
 use App\Models\Budget;
-use App\Models\Challenge;
+use App\Models\Quest;
 use App\Models\FinancialGoal;
 use App\Models\Badge;
 use App\Models\User;
@@ -39,71 +39,9 @@ class UserDashboardController extends Controller
         return $this->renderFeature($request, 'goals', 'Goals');
     }
 
-    public function challenges(Request $request)
-    {
-        return $this->renderFeature($request, 'challenges', 'Challenges');
-    }
-
     public function quests(Request $request)
     {
-        return $this->renderFeature($request, 'quests', 'Quest Harian');
-    }
-
-    private function questTemplateByKey(string $key): ?array
-    {
-        return collect($this->questTemplates())
-            ->firstWhere('key', $key);
-    }
-
-    private function activateQuestTemplate(int $userId, array $template): Challenge
-    {
-        $existing = Challenge::query()
-            ->where('user_id', $userId)
-            ->where('name', $template['name'])
-            ->where('status', 'active')
-            ->first();
-
-        if ($existing) {
-            return $existing;
-        }
-
-        $criteria = $template['criteria'] ?? [];
-        if (! is_array($criteria)) {
-            $criteria = [];
-        }
-        $criteria['flow'] = $template['flow'] ?? 'both';
-
-        return Challenge::query()->create([
-            'user_id' => $userId,
-            'name' => $template['name'],
-            'description' => $template['description'],
-            'difficulty' => $template['difficulty'],
-            'reward_xp' => $template['reward_xp'],
-            'start_date' => now()->toDateString(),
-            'end_date' => now()->addDays($template['duration_days'])->toDateString(),
-            'status' => 'active',
-            'category' => 'quest',
-            'criteria' => json_encode($criteria),
-        ]);
-    }
-
-    public function joinQuest(Request $request)
-    {
-        $validated = $request->validate([
-            'quest_key' => ['required', 'string'],
-        ]);
-
-        $template = $this->questTemplateByKey($validated['quest_key']);
-
-        if (! $template) {
-            return redirect()->route('dashboard.quests')->with('error', 'Quest tidak ditemukan.');
-        }
-
-        $userId = $request->user()->id;
-
-        $this->activateQuestTemplate($userId, $template);
-
-        return redirect()->route('dashboard.quests')->with('success', 'Quest berhasil di-join.');
+        return $this->renderFeature($request, 'quests', 'Quest');
     }
 
     public function badges(Request $request)
@@ -126,6 +64,12 @@ class UserDashboardController extends Controller
         return $this->renderFeature($request, 'leaderboard', 'Leaderboard');
     }
 
+    private function questTemplateByKey(string $key): ?array
+    {
+        return collect($this->questTemplates())
+            ->firstWhere('key', $key);
+    }
+
     public function storeTransaction(StoreTransactionRequest $request)
     {
         if (! $this->hasTransactionColumns()) {
@@ -136,7 +80,6 @@ class UserDashboardController extends Controller
         $validated = $request->validated();
         $userId = $request->user()->id;
 
-        $questTemplate = null;
         if (($validated['mode'] ?? null) === 'quest') {
             $questTemplate = $this->questTemplateByKey((string) ($validated['quest_key'] ?? ''));
 
@@ -146,14 +89,11 @@ class UserDashboardController extends Controller
             }
 
             $this->activateQuestTemplate($userId, $questTemplate);
-        }
 
-        // Handle Quest Mode (transaction-based quest completion)
-        if (($validated['mode'] ?? null) === 'quest') {
-            $questType = (string) ($questTemplate['flow'] ?? 'income');
-            $validated['type'] = $questType === 'expense' ? 'expense' : 'income';
+            $validated['type'] = (string) ($questTemplate['flow'] ?? 'income') === 'expense' ? 'expense' : 'income';
+            $validated['category_id'] = $this->questCategoryId($questTemplate);
 
-            if ($questType === 'expense') {
+            if (($questTemplate['flow'] ?? 'income') === 'expense') {
                 $validated['budget_id'] = $validated['budget_id'] ?? null;
             }
 
@@ -166,7 +106,7 @@ class UserDashboardController extends Controller
 
             $xpEarned = $this->calculateXp($validated['type'], (float) $validated['amount']);
 
-            $transaction = Transaction::query()->create([
+            Transaction::query()->create([
                 'user_id' => $userId,
                 'category_id' => $categoryId,
                 'type' => $validated['type'],
@@ -178,8 +118,8 @@ class UserDashboardController extends Controller
 
             $this->applyXpDelta($userId, $xpEarned);
 
-            $message = 'Quest transaction berhasil dicatat.';
             $questResult = $this->syncQuestProgressFromTransaction($userId, (string) $validated['transaction_date']);
+            $message = 'Quest transaction berhasil dicatat.';
             if ($questResult['completed_count'] > 0) {
                 $message .= ' 🎯 ' . $questResult['completed_count'] . ' quest selesai! +' . $questResult['xp_rewarded'] . ' XP';
             }
@@ -622,7 +562,7 @@ class UserDashboardController extends Controller
             ->with('success', 'Goal berhasil dihapus.');
     }
 
-    public function storeChallenge(Request $request)
+    public function storeQuest(Request $request)
     {
         $validated = $request->validate([
             'name' => ['required', 'string', 'max:255'],
@@ -634,7 +574,7 @@ class UserDashboardController extends Controller
             'category' => ['nullable', 'string', 'max:100'],
         ]);
 
-        Challenge::query()->create([
+        Quest::query()->create([
             'user_id' => $request->user()->id,
             'name' => $validated['name'],
             'description' => $validated['description'] ?? null,
@@ -646,13 +586,13 @@ class UserDashboardController extends Controller
             'category' => $validated['category'] ?? null,
         ]);
 
-        return redirect()->route('dashboard.challenges')
-            ->with('success', 'Challenge berhasil dibuat.');
+        return redirect()->route('dashboard.quests')
+            ->with('success', 'Quest berhasil dibuat.');
     }
 
-    public function updateChallenge(Request $request, Challenge $challenge)
+    public function updateQuest(Request $request, Quest $quest)
     {
-        if ($challenge->user_id !== $request->user()->id) {
+        if ($quest->user_id !== $request->user()->id) {
             abort(403);
         }
 
@@ -667,22 +607,43 @@ class UserDashboardController extends Controller
             'category' => ['nullable', 'string', 'max:100'],
         ]);
 
-        $challenge->update($validated);
+        $quest->update($validated);
 
-        return redirect()->route('dashboard.challenges')
-            ->with('success', 'Challenge berhasil diperbarui.');
+        return redirect()->route('dashboard.quests')
+            ->with('success', 'Quest berhasil diperbarui.');
     }
 
-    public function destroyChallenge(Request $request, Challenge $challenge)
+    public function destroyQuest(Request $request, Quest $quest)
     {
-        if ($challenge->user_id !== $request->user()->id) {
+        if ($quest->user_id !== $request->user()->id) {
             abort(403);
         }
 
-        $challenge->delete();
+        $quest->delete();
 
-        return redirect()->route('dashboard.challenges')
-            ->with('success', 'Challenge berhasil dihapus.');
+        return redirect()->route('dashboard.quests')
+            ->with('success', 'Quest berhasil dihapus.');
+    }
+
+    public function joinQuest(Request $request)
+    {
+        $validated = $request->validate([
+            'quest_key' => ['required', 'string'],
+        ]);
+
+        $template = $this->questTemplateByKey($validated['quest_key']);
+
+        if (! $template) {
+            return redirect()->route('dashboard.quests')->with('error', 'Quest tidak ditemukan.');
+        }
+
+        if (($template['mode'] ?? 'auto') !== 'auto') {
+            return redirect()->route('dashboard.quests')->with('error', 'Quest manual dibuka dari halaman transaksi.');
+        }
+
+        $this->activateQuestTemplate($request->user()->id, $template);
+
+        return redirect()->route('dashboard.quests')->with('success', 'Quest berhasil di-join.');
     }
 
     private function renderFeature(Request $request, string $feature, string $featureTitle)
@@ -699,22 +660,31 @@ class UserDashboardController extends Controller
         $data['editingTransactionId'] = (int) $request->query('edit', 0);
         $data['budgets'] = Budget::query()->where('user_id', $user->id)->where('is_active', true)->get();
         $data['goals'] = FinancialGoal::query()->where('user_id', $user->id)->where('status', 'active')->orderBy('target_date')->get();
-        $data['challenges'] = Challenge::query()->where('user_id', $user->id)->where('status', 'active')->orderBy('end_date')->get();
-        $data['allChallenges'] = Challenge::query()->where('user_id', $user->id)->orderByDesc('created_at')->get();
         $data['userBadges'] = UserBadge::query()->where('user_id', $user->id)->with('badge')->orderBy('earned_at', 'desc')->get();
         $data['editingBudgetId'] = (int) $request->query('edit_budget', 0);
         $data['editingGoalId'] = (int) $request->query('edit_goal', 0);
-        $data['editingChallengeId'] = (int) $request->query('edit_challenge', 0);
         $data['leaderboardRows'] = $this->leaderboardRows();
         $data['leaderboardViewerId'] = $user->id;
         $data['badgeCatalog'] = $this->badgeCatalogForUser($user->id);
+        $data['quests'] = Quest::query()->where('user_id', $user->id)->where('status', 'active')->orderBy('end_date')->get();
+        $data['allQuests'] = Quest::query()->where('user_id', $user->id)->orderByDesc('created_at')->get();
+        
+        // Pass manual quest templates for quest picker modal
+        $data['manualQuestTemplates'] = collect($this->questTemplates())
+            ->filter(fn (array $t) => ($t['mode'] ?? 'auto') === 'manual')
+            ->values()
+            ->all();
         $data['questActiveCards'] = $this->activeQuestCards($user->id);
         $data['questCompletedCards'] = $this->questCardsByStatus($user->id, 'completed');
+        $data['questFailedCards'] = $this->questCardsByStatus($user->id, 'failed');
         $data['questMode'] = $request->query('mode', null);
         $data['questFlow'] = $request->query('flow', null);
         $data['questAvailableTemplates'] = $this->availableQuestTemplates($user->id, $data['questFlow']);
         $data['questSelectedKey'] = $request->query('quest_key', null);
         $data['questSelectedTemplate'] = $data['questSelectedKey'] ? $this->questTemplateByKey((string) $data['questSelectedKey']) : null;
+        $data['questSelectedCategoryId'] = $data['questSelectedTemplate'] ? $this->questCategoryId($data['questSelectedTemplate']) : null;
+
+        $this->syncQuestProgressFromTransaction($user->id, now()->toDateString());
 
         // Check & award budget badges saat budget page di-render
         if ($feature === 'budgets') {
@@ -750,7 +720,7 @@ class UserDashboardController extends Controller
 
                 $streak = $this->activityStreakDays($user->id);
                 $goalProgress = $this->averageGoalProgress($user->id);
-                $completedChallenges = (int) Challenge::query()
+                $completedQuests = (int) Quest::query()
                     ->where('user_id', $user->id)
                     ->where('status', 'completed')
                     ->count();
@@ -774,7 +744,7 @@ class UserDashboardController extends Controller
                     + ($activeDays * 3)
                     + ($streak * 15)
                     + ($goalProgress * 2)
-                    + ($completedChallenges * 20)
+                    + ($completedQuests * 20)
                     + ($xp * 0.3)
                     + ($badgesCount * 30)
                 );
@@ -790,6 +760,7 @@ class UserDashboardController extends Controller
                     'xp' => $xp,
                     'badges_count' => $badgesCount,
                     'badges_preview' => $badgesPreview,
+                    'quest_completed' => $completedQuests,
                     'score' => $score,
                 ];
             })
@@ -1140,33 +1111,122 @@ class UserDashboardController extends Controller
     {
         return [
             [
-                'key' => 'save_300k',
+                'key' => 'save_income_300k',
                 'name' => 'Nabung Rp 300.000',
-                'description' => 'Tambahkan pemasukan sampai mencapai target nabung selama periode quest.',
+                'description' => 'Kumpulkan pemasukan sampai target tercapai dalam periode quest.',
                 'difficulty' => 'medium',
                 'reward_xp' => 75,
                 'duration_days' => 14,
+                'mode' => 'manual',
                 'flow' => 'income',
-                'criteria' => ['type' => 'income_total', 'target' => 300000, 'unit' => 'rupiah'],
+                'transaction_type' => 'income',
+                'category_name' => 'Gaji',
+                'criteria' => ['tracking' => 'income_total', 'target' => 300000, 'unit' => 'rupiah'],
             ],
             [
-                'key' => 'save_200k',
-                'name' => 'Hemat Rp 200.000',
-                'description' => 'Kendalikan pengeluaran agar total expense tetap sesuai target hemat quest.',
+                'key' => 'save_food_200k',
+                'name' => 'Hemat Rp 200.000 dari Makanan',
+                'description' => 'Jaga pengeluaran makanan agar tetap di bawah target quest.',
                 'difficulty' => 'easy',
-                'reward_xp' => 50,
+                'reward_xp' => 60,
                 'duration_days' => 7,
+                'mode' => 'manual',
                 'flow' => 'expense',
-                'criteria' => ['type' => 'expense_total', 'target' => 200000, 'unit' => 'rupiah'],
+                'transaction_type' => 'expense',
+                'category_name' => 'Makanan & Minuman',
+                'criteria' => ['tracking' => 'expense_category_total', 'target' => 200000, 'unit' => 'rupiah'],
+            ],
+            [
+                'key' => 'limit_shopping_150k',
+                'name' => 'Batasi Belanja Rp 150.000',
+                'description' => 'Batasi total pengeluaran kategori belanja selama periode quest.',
+                'difficulty' => 'medium',
+                'reward_xp' => 65,
+                'duration_days' => 7,
+                'mode' => 'manual',
+                'flow' => 'expense',
+                'transaction_type' => 'expense',
+                'category_name' => 'Belanja',
+                'criteria' => ['tracking' => 'expense_category_total', 'target' => 150000, 'unit' => 'rupiah'],
+            ],
+            [
+                'key' => 'count_10_transactions',
+                'name' => 'Catat 10 Transaksi Minggu Ini',
+                'description' => 'Lakukan 10 transaksi dalam 7 hari untuk menjaga konsistensi finansial.',
+                'difficulty' => 'easy',
+                'reward_xp' => 80,
+                'duration_days' => 7,
+                'mode' => 'auto',
+                'flow' => 'both',
+                'criteria' => ['tracking' => 'transaction_count', 'target' => 10, 'unit' => 'count'],
+            ],
+            [
+                'key' => 'no_spend_5_days',
+                'name' => 'Tidak Belanja 5 Hari',
+                'description' => 'Jalani periode tanpa pengeluaran agar kebiasaan belanja lebih terkendali.',
+                'difficulty' => 'hard',
+                'reward_xp' => 90,
+                'duration_days' => 5,
+                'mode' => 'auto',
+                'flow' => 'expense',
+                'criteria' => ['tracking' => 'no_spend_days', 'target' => 5, 'unit' => 'days'],
+            ],
+            [
+                'key' => 'login_7_days',
+                'name' => 'Login 7 Hari Berturut',
+                'description' => 'Masuk ke aplikasi setiap hari selama seminggu untuk menjaga streak.',
+                'difficulty' => 'medium',
+                'reward_xp' => 100,
+                'duration_days' => 7,
+                'mode' => 'auto',
+                'flow' => 'both',
+                'criteria' => ['tracking' => 'login_streak', 'target' => 7, 'unit' => 'days'],
             ],
         ];
     }
 
+    private function activateQuestTemplate(int $userId, array $template): Quest
+    {
+        $existing = Quest::query()
+            ->where('user_id', $userId)
+            ->where('name', $template['name'])
+            ->where('status', 'active')
+            ->first();
+
+        if ($existing) {
+            return $existing;
+        }
+
+        $criteria = $template['criteria'] ?? [];
+        if (! is_array($criteria)) {
+            $criteria = [];
+        }
+        $criteria['flow'] = $template['flow'] ?? 'both';
+        $criteria['template_key'] = $template['key'] ?? $template['name'];
+        $criteria['mode'] = $template['mode'] ?? 'auto';
+        $criteria['tracking'] = $criteria['tracking'] ?? 'transaction_count';
+        $criteria['transaction_type'] = $template['transaction_type'] ?? null;
+        $criteria['category_name'] = $template['category_name'] ?? null;
+
+        return Quest::query()->create([
+            'user_id' => $userId,
+            'name' => $template['name'],
+            'description' => $template['description'],
+            'difficulty' => $template['difficulty'],
+            'reward_xp' => $template['reward_xp'],
+            'start_date' => now()->toDateString(),
+            'end_date' => now()->addDays($template['duration_days'])->toDateString(),
+            'status' => 'active',
+            'category' => 'quest',
+            'criteria' => $criteria,
+        ]);
+    }
+
     private function availableQuestTemplates(int $userId, ?string $flow = null): Collection
     {
-        $activeNames = Challenge::query()
+        $activeNames = Quest::query()
             ->where('user_id', $userId)
-            ->where('status', 'active')
+            ->whereIn('status', ['active', 'completed', 'failed'])
             ->pluck('name')
             ->all();
         $templates = collect($this->questTemplates())
@@ -1186,24 +1246,28 @@ class UserDashboardController extends Controller
 
     private function questCardsByStatus(int $userId, string $status): Collection
     {
-        $active = Challenge::query()
+        $active = Quest::query()
             ->where('user_id', $userId)
             ->where('status', $status)
             ->orderBy('end_date')
             ->get();
 
-        return $active->map(function (Challenge $challenge) use ($userId): array {
-            $progress = $this->calculateQuestProgress($challenge, $userId);
+        return $active->map(function (Quest $quest) use ($userId): array {
+            $progress = $this->calculateQuestProgress($quest, $userId);
+            $criteria = is_array($quest->criteria) ? $quest->criteria : [];
+            $mode = (string) ($criteria['mode'] ?? 'auto');
 
             return [
-                'id' => $challenge->id,
-                'name' => $challenge->name,
-                'description' => $challenge->description,
-                'difficulty' => $challenge->difficulty,
-                'reward_xp' => (int) $challenge->reward_xp,
-                'end_date' => $challenge->end_date,
-                'days_remaining' => $challenge->daysRemaining(),
-                'status' => $challenge->status,
+                'id' => $quest->id,
+                'name' => $quest->name,
+                'description' => $quest->description,
+                'difficulty' => $quest->difficulty,
+                'reward_xp' => (int) $quest->reward_xp,
+                'end_date' => $quest->end_date,
+                'days_remaining' => $quest->daysRemaining(),
+                'status' => $quest->status,
+                'display_mode' => $mode,
+                'display_mode_label' => $mode === 'manual' ? '📝 Manual' : '⚡ Auto',
                 'current' => $progress['current'],
                 'target' => $progress['target'],
                 'percentage' => $progress['percentage'],
@@ -1214,10 +1278,155 @@ class UserDashboardController extends Controller
         });
     }
 
-    /**
-     * Auto-award badges based on current XP/level if criteria met.
-     * Called when rendering badges feature so users with 100% progress get badges.
-     */
+    private function calculateQuestProgress(Quest $quest, int $userId): array
+    {
+        $criteria = is_array($quest->criteria) ? $quest->criteria : [];
+        $tracking = (string) ($criteria['tracking'] ?? 'transaction_count');
+        $target = max(1.0, (float) ($criteria['target'] ?? 1));
+        $startDate = Carbon::parse($quest->start_date)->toDateString();
+        $endDate = Carbon::parse($quest->end_date)->toDateString();
+        $current = 0.0;
+        $label = '0 / ' . (int) $target;
+
+        if ($tracking === 'income_total') {
+            $income = (float) Transaction::query()
+                ->where('user_id', $userId)
+                ->where('type', 'income')
+                ->whereBetween('transaction_date', [$startDate, $endDate])
+                ->sum('amount');
+
+            $current = $income;
+            $label = 'Rp ' . number_format($current, 0, ',', '.') . ' / Rp ' . number_format($target, 0, ',', '.');
+        } elseif ($tracking === 'expense_category_total') {
+            $categoryId = $this->questCategoryId($criteria);
+            $expenseQuery = Transaction::query()
+                ->where('user_id', $userId)
+                ->where('type', 'expense')
+                ->whereBetween('transaction_date', [$startDate, $endDate]);
+
+            if ($categoryId) {
+                $expenseQuery->where('category_id', $categoryId);
+            }
+
+            $expense = (float) $expenseQuery->sum('amount');
+
+            $current = $expense;
+            $label = 'Rp ' . number_format($current, 0, ',', '.') . ' / Rp ' . number_format($target, 0, ',', '.');
+        } elseif ($tracking === 'expense_total') {
+            $expense = (float) Transaction::query()
+                ->where('user_id', $userId)
+                ->where('type', 'expense')
+                ->whereBetween('transaction_date', [$startDate, $endDate])
+                ->sum('amount');
+
+            $current = $expense;
+            $label = 'Rp ' . number_format($current, 0, ',', '.') . ' / Rp ' . number_format($target, 0, ',', '.');
+        } elseif ($tracking === 'no_spend_days') {
+            $totalDays = max(1, Carbon::parse($startDate)->diffInDays(min(Carbon::today(), Carbon::parse($endDate))) + 1);
+            $expenseDays = (int) Transaction::query()
+                ->where('user_id', $userId)
+                ->where('type', 'expense')
+                ->whereBetween('transaction_date', [$startDate, $endDate])
+                ->selectRaw('DATE(transaction_date) as day_key')
+                ->groupBy('day_key')
+                ->get()
+                ->count();
+
+            $current = max(0, $totalDays - $expenseDays);
+            $label = (int) $current . ' / ' . (int) $target . ' hari';
+        } elseif ($tracking === 'login_streak') {
+            $streak = (int) DB::table('gamification_profiles')
+                ->where('user_id', $userId)
+                ->value('current_streak');
+
+            $current = (float) $streak;
+            $label = (int) $current . ' / ' . (int) $target . ' hari';
+        } else {
+            $query = Transaction::query()
+                ->where('user_id', $userId)
+                ->whereBetween('transaction_date', [$startDate, $endDate]);
+
+            $current = (float) $query->count();
+            $label = (int) $current . ' / ' . (int) $target . ' transaksi';
+        }
+
+        $percentage = (int) min(100, round(($current / max($target, 1)) * 100));
+        $isCompleted = $current >= $target;
+        $barColor = $percentage >= 100 ? '#16a34a' : ($percentage >= 80 ? '#f59e0b' : '#4b5563');
+
+        return [
+            'current' => $current,
+            'target' => $target,
+            'percentage' => $percentage,
+            'label' => $label,
+            'bar_color' => $barColor,
+            'is_completed' => $isCompleted,
+        ];
+    }
+
+    private function syncQuestProgressFromTransaction(int $userId, string $transactionDate): array
+    {
+        if (! Schema::hasTable('challenges')) {
+            return ['completed_count' => 0, 'xp_rewarded' => 0];
+        }
+
+        $date = Carbon::parse($transactionDate)->toDateString();
+        $activeQuests = Quest::query()
+            ->where('user_id', $userId)
+            ->where('status', 'active')
+            ->where('end_date', '>=', $date)
+            ->get();
+
+        $completedCount = 0;
+        $xpRewarded = 0;
+
+        foreach ($activeQuests as $quest) {
+            /** @var Quest $quest */
+            if (Carbon::parse($quest->end_date)->isPast() && $quest->status === 'active') {
+                $quest->update(['status' => 'failed']);
+                continue;
+            }
+
+            $progress = $this->calculateQuestProgress($quest, $userId);
+            if (! $progress['is_completed']) {
+                continue;
+            }
+
+            $quest->update(['status' => 'completed']);
+            $completedCount++;
+            $xpReward = (int) $quest->reward_xp;
+            $xpRewarded += $xpReward;
+            $this->applyXpDelta($userId, $xpReward);
+            $this->awardBadge($userId, 'Quest Finisher');
+        }
+
+        return ['completed_count' => $completedCount, 'xp_rewarded' => $xpRewarded];
+    }
+
+    private function questCategoryId(array $template): ?int
+    {
+        if (! $this->hasCategoryColumns()) {
+            return null;
+        }
+
+        $categoryName = (string) ($template['category_name'] ?? '');
+        $transactionType = (string) ($template['transaction_type'] ?? 'expense');
+
+        if ($categoryName === '') {
+            return null;
+        }
+
+        return Category::query()
+            ->where('name', $categoryName)
+            ->where('type', $transactionType)
+            ->value('id');
+    }
+
+    private function questModeLabel(string $mode): string
+    {
+        return $mode === 'manual' ? '📝 Manual' : '⚡ Auto';
+    }
+
     private function checkAndAwardXpBadges(int $userId): void
     {
         if (! Schema::hasTable('badges') || ! Schema::hasTable('user_badges')) {
@@ -1246,106 +1455,4 @@ class UserDashboardController extends Controller
         }
     }
 
-    private function calculateQuestProgress(Challenge $challenge, int $userId): array
-    {
-        $criteria = json_decode((string) ($challenge->criteria ?? ''), true);
-        if (! is_array($criteria)) {
-            $criteria = [];
-        }
-
-        $type = (string) ($criteria['type'] ?? 'transaction_count');
-        $target = max(1.0, (float) ($criteria['target'] ?? 1));
-        $startDate = Carbon::parse($challenge->start_date)->toDateString();
-        $endDate = Carbon::parse($challenge->end_date)->toDateString();
-        $current = 0.0;
-        $label = '0 / ' . (int) $target;
-
-        if ($type === 'income_total') {
-            $income = (float) Transaction::query()
-                ->where('user_id', $userId)
-                ->where('type', 'income')
-                ->whereBetween('transaction_date', [$startDate, $endDate])
-                ->sum('amount');
-
-            $current = $income;
-            $label = 'Rp ' . number_format($current, 0, ',', '.') . ' / Rp ' . number_format($target, 0, ',', '.');
-        } elseif ($type === 'expense_total') {
-            $expense = (float) Transaction::query()
-                ->where('user_id', $userId)
-                ->where('type', 'expense')
-                ->whereBetween('transaction_date', [$startDate, $endDate])
-                ->sum('amount');
-
-            $current = $expense;
-            $label = 'Rp ' . number_format($current, 0, ',', '.') . ' / Rp ' . number_format($target, 0, ',', '.');
-        } elseif ($type === 'no_spend_days') {
-            $totalDays = max(1, Carbon::parse($startDate)->diffInDays(min(Carbon::today(), Carbon::parse($endDate))) + 1);
-            $expenseDays = (int) Transaction::query()
-                ->where('user_id', $userId)
-                ->where('type', 'expense')
-                ->whereBetween('transaction_date', [$startDate, $endDate])
-                ->selectRaw('DATE(transaction_date) as day_key')
-                ->groupBy('day_key')
-                ->get()
-                ->count();
-
-            $current = max(0, $totalDays - $expenseDays);
-            $label = (int) $current . ' / ' . (int) $target . ' hari';
-        } else {
-            $query = Transaction::query()
-                ->where('user_id', $userId)
-                ->whereBetween('transaction_date', [$startDate, $endDate]);
-
-            $current = (float) $query->count();
-            $label = (int) $current . ' / ' . (int) $target . ' transaksi';
-        }
-
-        $percentage = (int) min(100, round(($current / $target) * 100));
-        $isCompleted = $current >= $target;
-        $barColor = $percentage >= 100 ? '#16a34a' : ($percentage >= 80 ? '#f59e0b' : '#4b5563');
-
-        return [
-            'current' => $current,
-            'target' => $target,
-            'percentage' => $percentage,
-            'label' => $label,
-            'bar_color' => $barColor,
-            'is_completed' => $isCompleted,
-        ];
-    }
-
-    private function syncQuestProgressFromTransaction(int $userId, string $transactionDate): array
-    {
-        if (! Schema::hasTable('challenges')) {
-            return ['completed_count' => 0, 'xp_rewarded' => 0];
-        }
-
-        $date = Carbon::parse($transactionDate)->toDateString();
-        $activeChallenges = Challenge::query()
-            ->where('user_id', $userId)
-            ->where('status', 'active')
-            ->where('start_date', '<=', $date)
-            ->where('end_date', '>=', $date)
-            ->get();
-
-        $completedCount = 0;
-        $xpRewarded = 0;
-
-        foreach ($activeChallenges as $challenge) {
-            /** @var Challenge $challenge */
-            $progress = $this->calculateQuestProgress($challenge, $userId);
-            if (! $progress['is_completed']) {
-                continue;
-            }
-
-            $challenge->update(['status' => 'completed']);
-            $completedCount++;
-            $xpReward = (int) $challenge->reward_xp;
-            $xpRewarded += $xpReward;
-            $this->applyXpDelta($userId, $xpReward);
-            $this->awardBadge($userId, 'Quest Finisher');
-        }
-
-        return ['completed_count' => $completedCount, 'xp_rewarded' => $xpRewarded];
-    }
 }

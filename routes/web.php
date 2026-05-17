@@ -5,9 +5,7 @@ use App\Http\Controllers\GamificationController;
 use App\Http\Controllers\FriendController;
 use App\Http\Controllers\UserDashboardController;
 use App\Http\Controllers\WalletController;
-use App\Http\Controllers\Admin\AdminController;
-use App\Http\Controllers\Admin\TransactionController;
-use App\Http\Controllers\Admin\UserController;
+
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
@@ -31,12 +29,11 @@ Route::middleware(['auth'])->group(function () {
     Route::put('/dashboard/goals/{goal}', [UserDashboardController::class, 'updateGoal'])->name('dashboard.goals.update');
     Route::delete('/dashboard/goals/{goal}', [UserDashboardController::class, 'destroyGoal'])->name('dashboard.goals.destroy');
     
-    Route::get('/dashboard/challenges', [UserDashboardController::class, 'challenges'])->name('dashboard.challenges');
-    Route::post('/dashboard/challenges', [UserDashboardController::class, 'storeChallenge'])->name('dashboard.challenges.store');
-    Route::put('/dashboard/challenges/{challenge}', [UserDashboardController::class, 'updateChallenge'])->name('dashboard.challenges.update');
-    Route::delete('/dashboard/challenges/{challenge}', [UserDashboardController::class, 'destroyChallenge'])->name('dashboard.challenges.destroy');
     Route::get('/dashboard/quests', [UserDashboardController::class, 'quests'])->name('dashboard.quests');
     Route::post('/dashboard/quests/join', [UserDashboardController::class, 'joinQuest'])->name('dashboard.quests.join');
+    Route::post('/dashboard/quests', [UserDashboardController::class, 'storeQuest'])->name('dashboard.quests.store');
+    Route::put('/dashboard/quests/{quest}', [UserDashboardController::class, 'updateQuest'])->name('dashboard.quests.update');
+    Route::delete('/dashboard/quests/{quest}', [UserDashboardController::class, 'destroyQuest'])->name('dashboard.quests.destroy');
     
     Route::get('/dashboard/badges', [UserDashboardController::class, 'badges'])->name('dashboard.badges');
     Route::get('/dashboard/leaderboard', [UserDashboardController::class, 'leaderboard'])->name('dashboard.leaderboard');
@@ -68,12 +65,4 @@ Route::middleware('auth')->group(function () {
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 });
-
-// Admin Routes
-Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () {
-    Route::get('/', [AdminController::class, 'index'])->name('dashboard');
-    Route::resource('transactions', TransactionController::class);
-    Route::get('/users', [UserController::class, 'index'])->name('users');
-});
-
 require __DIR__.'/auth.php';

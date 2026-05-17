@@ -77,17 +77,3 @@ Route::get('/categories', function () {
         'data' => \App\Models\Category::all()
     ]);
 });
-
-// Admin Routes
-Route::middleware(['auth:sanctum', 'admin'])->prefix('admin')->group(function () {
-    
-    $controller = \App\Http\Controllers\Admin\TransactionController::class;
-    
-    Route::get('/transactions', [$controller, 'index']);
-    Route::post('/transactions', [$controller, 'store']);
-    Route::get('/transactions/{id}', [$controller, 'show']);
-    Route::put('/transactions/{id}', [$controller, 'update']);
-    Route::delete('/transactions/{id}', [$controller, 'destroy']);
-    Route::get('/transactions/user/{userId}', [$controller, 'byUser']);
-    
-});

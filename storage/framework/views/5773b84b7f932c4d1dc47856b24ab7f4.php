@@ -487,7 +487,7 @@
                 <div>
                     <span class="eyebrow">Financial Gamification for Daily Growth</span>
                     <h1>Kelola uang lebih rapi, <span class="text-blue">naik level setiap hari.</span></h1>
-                    <p>FinCo menggabungkan pencatatan finansial, challenge harian, dan sistem XP supaya kebiasaan keuangan terasa lebih ringan, konsisten, dan seru.</p>
+                    <p>FinCo menggabungkan pencatatan finansial, quest harian, dan sistem XP supaya kebiasaan keuangan terasa lebih ringan, konsisten, dan seru.</p>
                     <div class="hero-actions">
                         <?php if(Route::has('register')): ?>
                             <a class="btn btn-primary" href="<?php echo e(route('register')); ?>">Mulai Gratis</a>
@@ -590,7 +590,7 @@
                     <article class="step">
                         <span class="step-number">3</span>
                         <h3>Naik Level</h3>
-                        <p>Selesaikan challenge, jaga streak, dan naik level sambil membangun kebiasaan keuangan sehat.</p>
+                        <p>Selesaikan quest, jaga streak, dan naik level sambil membangun kebiasaan keuangan sehat.</p>
                     </article>
                 </div>
             </div>

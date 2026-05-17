@@ -36,7 +36,7 @@
                             </article>
                         @empty
                             <div class="rounded-lg border border-dashed border-gray-300 p-4 text-sm text-gray-600 sm:col-span-2 lg:col-span-3">
-                                Belum ada badge yang didapat. Mulai dari transaksi, top up, dan challenge untuk unlock badge pertama.
+                                Belum ada badge yang didapat. Mulai dari transaksi, top up, dan quest untuk unlock badge pertama.
                             </div>
                         @endforelse
                     </div>

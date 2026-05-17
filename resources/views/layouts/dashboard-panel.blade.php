@@ -147,7 +147,7 @@
             <li><a class="{{ ($menuActive ?? '') === 'transactions' ? 'active' : '' }}" href="{{ route('dashboard.transactions') }}">Transaksi <small>fitur</small></a></li>
             <li><a class="{{ ($menuActive ?? '') === 'budgets' ? 'active' : '' }}" href="{{ route('dashboard.budgets') }}">Budget <small>fitur</small></a></li>
             <li><a class="{{ ($menuActive ?? '') === 'goals' ? 'active' : '' }}" href="{{ route('dashboard.goals') }}">Goals <small>fitur</small></a></li>
-            <li><a class="{{ ($menuActive ?? '') === 'challenges' ? 'active' : '' }}" href="{{ route('dashboard.challenges') }}">Challenges <small>fitur</small></a></li>
+            <li><a class="{{ ($menuActive ?? '') === 'quests' ? 'active' : '' }}" href="{{ route('dashboard.quests') }}">Quest <small>fitur</small></a></li>
             <li><a class="{{ ($menuActive ?? '') === 'badges' ? 'active' : '' }}" href="{{ route('dashboard.badges') }}">Badges <small>fitur</small></a></li>
             <li><a class="{{ ($menuActive ?? '') === 'leaderboard' ? 'active' : '' }}" href="{{ route('dashboard.leaderboard') }}">Leaderboard <small>fitur</small></a></li>
             <li><a class="{{ ($menuActive ?? '') === 'wallet' ? 'active' : '' }}" href="{{ route('dashboard.wallet') }}">Wallet <small>baru</small></a></li>

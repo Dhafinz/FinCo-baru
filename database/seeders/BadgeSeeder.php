@@ -42,8 +42,8 @@ class BadgeSeeder extends Seeder
                 'required_xp' => 300,
             ],
             [
-                'name' => 'Challenge Hunter',
-                'description' => 'Selesaikan 5 challenge berhasil',
+                'name' => 'Quest Hunter',
+                'description' => 'Selesaikan 5 quest berhasil',
                 'icon' => '🏆',
                 'required_level' => 5,
                 'required_xp' => 500,

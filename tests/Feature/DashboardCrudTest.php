@@ -3,7 +3,7 @@
 namespace Tests\Feature;
 
 use App\Models\Budget;
-use App\Models\Challenge;
+use App\Models\Quest;
 use App\Models\FinancialGoal;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -129,10 +129,10 @@ class DashboardCrudTest extends TestCase
     }
 
     /** @test */
-    public function user_can_create_challenge()
+    public function user_can_create_quest()
     {
-        $response = $this->actingAs($this->user)->post(route('dashboard.challenges.store'), [
-            'name' => 'No Spend Week',
+        $response = $this->actingAs($this->user)->post(route('dashboard.quests.store'), [
+            'name' => 'No Spend Week Quest',
             'description' => 'No spending for 7 days',
             'difficulty' => 'easy',
             'reward_xp' => 100,
@@ -140,23 +140,23 @@ class DashboardCrudTest extends TestCase
             'end_date' => now()->addDays(7)->toDateString(),
         ]);
 
-        $response->assertRedirect(route('dashboard.challenges'));
+        $response->assertRedirect(route('dashboard.quests'));
         $this->assertDatabaseHas('challenges', [
             'user_id' => $this->user->id,
-            'name' => 'No Spend Week',
+            'name' => 'No Spend Week Quest',
         ]);
     }
 
     /** @test */
-    public function user_can_update_challenge()
+    public function user_can_update_quest()
     {
-        $challenge = Challenge::factory()->for($this->user)->create([
-            'name' => 'Original Challenge',
+        $quest = Quest::factory()->for($this->user)->create([
+            'name' => 'Original Quest',
             'difficulty' => 'easy',
         ]);
 
-        $response = $this->actingAs($this->user)->put(route('dashboard.challenges.update', $challenge), [
-            'name' => 'Updated Challenge',
+        $response = $this->actingAs($this->user)->put(route('dashboard.quests.update', $quest), [
+            'name' => 'Updated Quest',
             'description' => 'Updated description',
             'difficulty' => 'hard',
             'reward_xp' => 200,
@@ -165,21 +165,21 @@ class DashboardCrudTest extends TestCase
             'status' => 'active',
         ]);
 
-        $response->assertRedirect(route('dashboard.challenges'));
-        $challenge->refresh();
-        $this->assertEquals('Updated Challenge', $challenge->name);
-        $this->assertEquals('hard', $challenge->difficulty);
+        $response->assertRedirect(route('dashboard.quests'));
+        $quest->refresh();
+        $this->assertEquals('Updated Quest', $quest->name);
+        $this->assertEquals('hard', $quest->difficulty);
     }
 
     /** @test */
-    public function user_can_delete_challenge()
+    public function user_can_delete_quest()
     {
-        $challenge = Challenge::factory()->for($this->user)->create();
+        $quest = Quest::factory()->for($this->user)->create();
 
-        $response = $this->actingAs($this->user)->delete(route('dashboard.challenges.destroy', $challenge));
+        $response = $this->actingAs($this->user)->delete(route('dashboard.quests.destroy', $quest));
 
-        $response->assertRedirect(route('dashboard.challenges'));
-        $this->assertDatabaseMissing('challenges', ['id' => $challenge->id]);
+        $response->assertRedirect(route('dashboard.quests'));
+        $this->assertDatabaseMissing('challenges', ['id' => $quest->id]);
     }
 
     /** @test */

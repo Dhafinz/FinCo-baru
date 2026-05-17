@@ -239,7 +239,8 @@
 
         .content-stack { min-width: 0; }
 
-        .hero {
+        .hero,
+        .hero.card {
             background: linear-gradient(135deg, #0f2c56 0%, #1e56a0 58%, #3b82f6 100%);
             color: #fff;
             border-radius: 18px;
@@ -251,20 +252,24 @@
             box-shadow: var(--shadow);
         }
 
-        .hero h1 {
+        .hero h1,
+        .hero.card h1 {
             font-family: 'Sora', sans-serif;
             font-size: clamp(1.25rem, 2.6vw, 1.8rem);
             margin-bottom: 0.35rem;
+            color: #fff;
         }
 
-        .hero p {
+        .hero p,
+        .hero.card p {
             color: #eef5ff;
             max-width: 65ch;
             font-size: 0.93rem;
             line-height: 1.55;
         }
 
-        .hero-pill {
+        .hero-pill,
+        .hero.card .hero-pill {
             background: rgba(255, 255, 255, 0.12);
             border: 1px solid rgba(255, 255, 255, 0.34);
             border-radius: 14px;
@@ -272,15 +277,18 @@
             min-width: 220px;
         }
 
-        .hero-pill strong {
+        .hero-pill strong,
+        .hero.card .hero-pill strong {
             display: block;
             font-family: 'Sora', sans-serif;
             font-size: 1.45rem;
             line-height: 1;
             margin-bottom: 0.25rem;
+            color: #fff;
         }
 
-        .hero-pill span {
+        .hero-pill span,
+        .hero.card .hero-pill span {
             font-size: 0.84rem;
             color: #dbeafe;
         }
@@ -1086,8 +1094,7 @@
                 <li><a class="<?php echo e(($activeFeature ?? '') === 'transactions' ? 'active' : ''); ?>" href="<?php echo e(route('dashboard.transactions')); ?>">Transaksi <small>fitur</small></a></li>
                 <li><a class="<?php echo e(($activeFeature ?? '') === 'budgets' ? 'active' : ''); ?>" href="<?php echo e(route('dashboard.budgets')); ?>">Budget <small>fitur</small></a></li>
                 <li><a class="<?php echo e(($activeFeature ?? '') === 'goals' ? 'active' : ''); ?>" href="<?php echo e(route('dashboard.goals')); ?>">Goals <small>fitur</small></a></li>
-                <li><a class="<?php echo e(($activeFeature ?? '') === 'challenges' ? 'active' : ''); ?>" href="<?php echo e(route('dashboard.challenges')); ?>">Challenges <small>fitur</small></a></li>
-                <li><a class="<?php echo e(($activeFeature ?? '') === 'quests' ? 'active' : ''); ?>" href="<?php echo e(route('dashboard.quests')); ?>">Quest <small>baru</small></a></li>
+                <li><a class="<?php echo e(($activeFeature ?? '') === 'quests' ? 'active' : ''); ?>" href="<?php echo e(route('dashboard.quests')); ?>">Quest <small>fitur</small></a></li>
                 <li><a class="<?php echo e(($activeFeature ?? '') === 'badges' ? 'active' : ''); ?>" href="<?php echo e(route('dashboard.badges')); ?>">Badges <small>fitur</small></a></li>
                 <li><a class="<?php echo e(($activeFeature ?? '') === 'leaderboard' ? 'active' : ''); ?>" href="<?php echo e(route('dashboard.leaderboard')); ?>">Leaderboard <small>fitur</small></a></li>
                 <li><a href="<?php echo e(route('dashboard.wallet')); ?>">Wallet <small>baru</small></a></li>
@@ -1183,8 +1190,8 @@
                                         <p><?php echo e(number_format(($goals ?? collect())->count(), 0, ',', '.')); ?> target aktif</p>
                                     </article>
                                     <article class="card feature-item">
-                                        <h3>Challenges</h3>
-                                        <p><?php echo e(number_format(($challenges ?? collect())->count(), 0, ',', '.')); ?> quest aktif</p>
+                                        <h3>Quest</h3>
+                                        <p><?php echo e(number_format(($questActiveCards ?? collect())->count(), 0, ',', '.')); ?> quest aktif</p>
                                     </article>
                                 </div>
                             </section>
@@ -1268,16 +1275,16 @@
                                             <div class="quick-foot"><span>Goal aware</span><strong>Catat income</strong></div>
                                         </a>
 
-                                        <a href="<?php echo e(route('dashboard.quests')); ?>" class="quick-action purple">
+                                        <button type="button" class="quick-action purple" id="openQuestModalBtn" style="border:none;background:none;cursor:pointer;text-align:left;width:100%;">
                                             <div class="quick-top">
                                                 <div>
-                                                    <h3>🎯 Quest Harian</h3>
-                                                    <p>Lihat challenge aktif, progress, dan reward XP yang bisa diklaim.</p>
+                                                    <h3>🎯 Quest</h3>
+                                                    <p>Pilih quest dari modal dan selesaikan lewat transaksi dengan tipe & kategori terkunci.</p>
                                                 </div>
                                                 <div class="emoji">🎯</div>
                                             </div>
-                                            <div class="quick-foot"><span>Gamification</span><strong>Buka quest</strong></div>
-                                        </a>
+                                            <div class="quick-foot"><span>Gamification</span><strong>Pilih quest</strong></div>
+                                        </button>
                                     </div>
                                 </article>
                             </section>
@@ -1298,7 +1305,6 @@
                                 };
                                 $selectedType = old('type', $transactionMode === 'expense' ? 'expense' : ($transactionMode === 'income' ? 'income' : ''));
                                 $categoryCollection = ($categoryOptions ?? collect())->values();
-                                $selectedQuestTemplate = $questSelectedTemplate ?? null;
                             ?>
 
                             <section class="mode-banner card">
@@ -1452,10 +1458,16 @@
                                             </div>
                                         </form>
                                     <?php elseif($transactionMode === 'quest'): ?>
+                                        <?php
+                                            $selectedQuestTemplate = $questSelectedTemplate ?? null;
+                                        ?>
+
                                         <form action="<?php echo e(route('dashboard.transactions.store')); ?>" method="POST" style="margin-top:0.75rem;" id="questForm">
                                             <?php echo csrf_field(); ?>
                                             <input type="hidden" name="mode" value="quest">
                                             <input type="hidden" name="quest_key" value="<?php echo e($questSelectedKey ?? ''); ?>">
+                                            <input type="hidden" name="type" value="<?php echo e($selectedQuestTemplate ? (($selectedQuestTemplate['flow'] ?? 'income') === 'expense' ? 'expense' : 'income') : ''); ?>">
+                                            <input type="hidden" name="category_id" value="<?php echo e($questSelectedCategoryId ?? ''); ?>">
 
                                             <div class="field" style="margin-bottom:0.7rem;">
                                                 <label>🎯 Quest Terpilih</label>
@@ -1463,8 +1475,9 @@
                                                     <?php
                                                         $questFlow = $selectedQuestTemplate['flow'] ?? 'both';
                                                         $questFlowLabel = $questFlow === 'income' ? 'Income' : ($questFlow === 'expense' ? 'Expense' : 'General');
+                                                        $questModeLabel = ($selectedQuestTemplate['mode'] ?? 'auto') === 'manual' ? '📝 Manual' : '⚡ Auto';
                                                     ?>
-                                                    <div class="locked-category"><?php echo e($selectedQuestTemplate['name']); ?> • Tipe: <?php echo e($questFlowLabel); ?></div>
+                                                    <div class="locked-category"><?php echo e($selectedQuestTemplate['name']); ?> • <?php echo e($questModeLabel); ?> • Tipe: <?php echo e($questFlowLabel); ?></div>
                                                     <small style="display:block;color:var(--muted);margin-top:0.16rem;">Reward +<?php echo e($selectedQuestTemplate['reward_xp']); ?> XP • <?php echo e($selectedQuestTemplate['description']); ?></small>
                                                 <?php else: ?>
                                                     <div class="placeholder">Quest belum dipilih. Kembali ke halaman quest untuk memilih quest dulu.</div>
@@ -1477,19 +1490,12 @@
                                                     <div class="locked-category" id="questLockedType"><?php echo e($selectedQuestTemplate ? (($selectedQuestTemplate['flow'] ?? 'income') === 'expense' ? 'Expense' : 'Income') : 'Pilih quest dulu'); ?></div>
                                                 </div>
                                                 <div class="field">
-                                                    <label for="quest_amount">Amount (Rp)</label>
-                                                    <input id="quest_amount" type="number" min="0" step="0.01" name="amount" value="<?php echo e(old('amount')); ?>" required <?php echo e($selectedQuestTemplate ? '' : 'disabled'); ?>>
+                                                    <label>Kategori (Auto dari Quest) 🔒</label>
+                                                    <div class="locked-category" id="questLockedCategory"><?php echo e($selectedQuestTemplate ? ($selectedQuestTemplate['category_name'] ?? 'Tergantung quest') : 'Pilih quest dulu'); ?></div>
                                                 </div>
                                                 <div class="field">
-                                                    <label for="quest_category">Kategori</label>
-                                                    <select id="quest_category" name="category_id" required <?php echo e($selectedQuestTemplate ? '' : 'disabled'); ?>>
-                                                        <option value="">Pilih kategori</option>
-                                                        <?php $__currentLoopData = $categoryCollection; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $category): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
-                                                            <?php if(($selectedQuestTemplate && ($selectedQuestTemplate['flow'] ?? 'income') === 'expense' && $category->type === 'expense') || ($selectedQuestTemplate && ($selectedQuestTemplate['flow'] ?? 'income') === 'income' && $category->type === 'income')): ?>
-                                                                <option value="<?php echo e($category->id); ?>" <?php echo e((string) old('category_id') === (string) $category->id ? 'selected' : ''); ?>><?php echo e($category->name); ?></option>
-                                                            <?php endif; ?>
-                                                        <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
-                                                    </select>
+                                                    <label for="quest_amount">Amount (Rp)</label>
+                                                    <input id="quest_amount" type="number" min="0" step="0.01" name="amount" value="<?php echo e(old('amount')); ?>" required <?php echo e($selectedQuestTemplate ? '' : 'disabled'); ?>>
                                                 </div>
                                                 <div class="field">
                                                     <label for="quest_date">Tanggal</label>
@@ -1501,22 +1507,22 @@
                                                 </div>
                                             </div>
 
-                                                <div id="questPreview" class="preview-card"
-                                                    data-quest-flow="<?php echo e($selectedQuestTemplate['flow'] ?? 'income'); ?>"
-                                                    data-quest-target="<?php echo e((float) ($selectedQuestTemplate['criteria']['target'] ?? 0)); ?>"
-                                                    data-quest-name="<?php echo e($selectedQuestTemplate['name'] ?? ''); ?>"
-                                                    data-quest-current="0"
-                                                    style="display:<?php echo e($selectedQuestTemplate ? 'block' : 'none'); ?>;">
-                                                    <?php if($selectedQuestTemplate): ?>
-                                                        <strong>📊 Quest Progress Preview</strong><br>
-                                                        Quest: <?php echo e($selectedQuestTemplate['name']); ?><br>
-                                                        • Current: Rp 0<br>
-                                                        • This transaction: Rp 0<br>
-                                                        • After: Rp 0<br>
-                                                        • Remaining: Rp <?php echo e(number_format((float) ($selectedQuestTemplate['criteria']['target'] ?? 0), 0, ',', '.')); ?>
+                                            <div id="questPreview" class="preview-card"
+                                                data-quest-flow="<?php echo e($selectedQuestTemplate['flow'] ?? 'income'); ?>"
+                                                data-quest-target="<?php echo e((float) ($selectedQuestTemplate['criteria']['target'] ?? 0)); ?>"
+                                                data-quest-name="<?php echo e($selectedQuestTemplate['name'] ?? ''); ?>"
+                                                data-quest-current="0"
+                                                style="display:<?php echo e($selectedQuestTemplate ? 'block' : 'none'); ?>;">
+                                                <?php if($selectedQuestTemplate): ?>
+                                                    <strong>📊 Quest Progress Preview</strong><br>
+                                                    Quest: <?php echo e($selectedQuestTemplate['name']); ?><br>
+                                                    • Current: Rp 0<br>
+                                                    • This transaction: Rp 0<br>
+                                                    • After: Rp 0<br>
+                                                    • Remaining: Rp <?php echo e(number_format((float) ($selectedQuestTemplate['criteria']['target'] ?? 0), 0, ',', '.')); ?>
 
-                                                    <?php endif; ?>
-                                                </div>
+                                                <?php endif; ?>
+                                            </div>
 
                                             <div class="row-actions">
                                                 <button type="submit" class="btn btn-primary" <?php echo e($selectedQuestTemplate ? '' : 'disabled'); ?>>💾 Selesaikan Quest</button>
@@ -1571,6 +1577,7 @@
                                         <div class="context-card">
                                             <h3>Preview Budget</h3>
                                             <p>Pilih budget, isi nominal, dan preview akan update real-time termasuk before/after serta estimasi XP.</p>
+                                        </div>
                                     <?php elseif($transactionMode === 'quest'): ?>
                                         <div class="context-card">
                                             <h3>Quest Preview</h3>
@@ -1963,55 +1970,10 @@
                                     </div>
                                 </article>
                             </section>
-                        <?php elseif($activeFeature === 'challenges'): ?>
-                            <section class="hero card">
-                                <div>
-                                    <h1>Fitur Challenges</h1>
-                                    <p>Challenge membantu membangun kebiasaan finansial sehat secara bertahap.</p>
-                                </div>
-                                <div class="hero-pill">
-                                    <strong>Level <?php echo e($currentLevel); ?></strong>
-                                    <span>Status tantangan user</span>
-                                </div>
-                            </section>
-
-                            <section class="card transaction-create">
-                                <h2>Challenge Auto-Tracking</h2>
-                                <p style="margin-top:0.2rem;color:var(--muted);font-size:0.84rem;">Challenge sekarang hanya dipantau otomatis dari transaksi. Fitur create/edit akan dipindah ke admin nanti.</p>
-                                <div class="placeholder" style="margin-top:0.75rem;">
-                                    Fokus challenge: transaksi apapun akan memperbarui progress secara otomatis. Tidak perlu pilih saat transaksi.
-                                </div>
-                            </section>
-
-                            <section class="layout">
-                                <article class="card panel" style="grid-column: 1 / -1;">
-                                    <h2>Daftar Challenge</h2>
-                                    <p>Challenge yang sedang berjalan atau sudah diselesaikan. Progress diperbarui otomatis dari aktivitas transaksi.</p>
-                                    <div class="transaction-list">
-                                        <?php $__empty_1 = true; $__currentLoopData = $challenges ?? collect(); $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $challenge): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); $__empty_1 = false; ?>
-                                            <div class="item">
-                                                <div style="width:100%;">
-                                                    <h3><?php echo e($challenge->name); ?> <span style="font-size:0.85rem;color:var(--muted);font-weight:500;"><?php echo e(ucfirst($challenge->difficulty)); ?></span></h3>
-                                                    <p>Periode: <?php echo e(\Illuminate\Support\Carbon::parse($challenge->start_date)->format('d M')); ?> - <?php echo e(\Illuminate\Support\Carbon::parse($challenge->end_date)->format('d M Y')); ?> • Reward: +<?php echo e($challenge->reward_xp); ?> XP</p>
-                                                    <p style="margin-top:0.3rem;font-size:0.82rem;">Status: <?php echo e(ucfirst($challenge->status)); ?> • Sisa <?php echo e($challenge->daysRemaining() ?? 0); ?> hari</p>
-
-                                                </div>
-                                                <div style="text-align:right; min-width: 165px;">
-                                                    <span class="badge" style="background: <?php echo e($challenge->difficulty === 'easy' ? '#dcfce7' : ($challenge->difficulty === 'hard' ? '#fee2e2' : '#dbeafe')); ?>; color: <?php echo e($challenge->difficulty === 'easy' ? '#166534' : ($challenge->difficulty === 'hard' ? '#991b1b' : '#1e3a8a')); ?>;"><?php echo e(ucfirst($challenge->difficulty)); ?></span>
-                                                    <div style="margin-top:0.25rem;font-weight:700;color:#1f3b63;">+<?php echo e($challenge->reward_xp); ?> XP</div>
-                                                    <div style="margin-top:0.35rem;font-size:0.78rem;color:var(--muted);">Auto-tracking</div>
-                                                </div>
-                                            </div>
-                                        <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); if ($__empty_1): ?>
-                                            <div class="placeholder">Belum ada challenge aktif. Nanti admin yang akan menambah challenge untuk user.</div>
-                                        <?php endif; ?>
-                                    </div>
-                                </article>
-                            </section>
                         <?php elseif($activeFeature === 'quests'): ?>
                             <section class="hero card">
                                 <div>
-                                    <h1>🎯 Quest Harian</h1>
+                                    <h1>🎯 Quest</h1>
                                     <p>Pantau quest aktif kamu, progress real-time, dan join quest baru untuk reward XP.</p>
                                 </div>
                                 <div class="hero-pill">
@@ -2027,7 +1989,7 @@
                                     <div class="quest-list">
                                         <?php $__empty_1 = true; $__currentLoopData = ($questActiveCards ?? collect()); $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $quest): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); $__empty_1 = false; ?>
                                             <div class="quest-card">
-                                                <h3><?php echo e($quest['name']); ?></h3>
+                                                <h3><?php echo e($quest['name']); ?> <span class="badge" style="margin-left:0.35rem;background:<?php echo e(($quest['display_mode'] ?? 'auto') === 'manual' ? '#dbeafe' : '#dcfce7'); ?>;color:<?php echo e(($quest['display_mode'] ?? 'auto') === 'manual' ? '#1d4ed8' : '#166534'); ?>;"><?php echo e($quest['display_mode_label'] ?? 'Auto'); ?></span></h3>
                                                 <p><?php echo e($quest['label']); ?></p>
                                                 <div class="quest-progress"><span style="width: <?php echo e($quest['percentage']); ?>%; background: <?php echo e($quest['bar_color']); ?>;"></span></div>
                                                 <p style="margin-top:0.35rem;font-size:0.8rem;color:var(--muted);">Reward: +<?php echo e($quest['reward_xp']); ?> XP • Deadline: <?php echo e($quest['days_remaining']); ?> hari lagi • Status: <?php echo e($quest['is_completed'] ? '✅ Completed' : '🟡 Active'); ?></p>
@@ -2039,18 +2001,18 @@
                                 </article>
 
                                 <article class="card panel" style="grid-column: 1 / -1;">
-                                    <h2>✅ Quest Selesai</h2>
-                                    <p>Quest yang sudah selesai dan bonus XP yang sudah masuk ke akunmu.</p>
+                                    <h2>🗂 Riwayat Quest</h2>
+                                    <p>Quest yang sudah selesai atau gagal tetap tersimpan sebagai histori progress kamu.</p>
                                     <div class="quest-list">
-                                        <?php $__empty_1 = true; $__currentLoopData = ($questCompletedCards ?? collect()); $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $quest): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); $__empty_1 = false; ?>
-                                            <div class="quest-card" style="border-color:#86efac;background:#f0fdf4;">
+                                        <?php $__empty_1 = true; $__currentLoopData = (($questCompletedCards ?? collect())->concat($questFailedCards ?? collect())); $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $quest): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); $__empty_1 = false; ?>
+                                            <div class="quest-card" style="border-color:<?php echo e(($quest['status'] ?? '') === 'failed' ? '#fecaca' : '#86efac'); ?>;background:<?php echo e(($quest['status'] ?? '') === 'failed' ? '#fef2f2' : '#f0fdf4'); ?>;">
                                                 <h3><?php echo e($quest['name']); ?></h3>
                                                 <p><?php echo e($quest['label']); ?></p>
-                                                <div class="quest-progress"><span style="width: 100%; background: #16a34a;"></span></div>
-                                                <p style="margin-top:0.35rem;font-size:0.8rem;color:var(--muted);">Reward: +<?php echo e($quest['reward_xp']); ?> XP • Status: ✅ Completed</p>
+                                                <div class="quest-progress"><span style="width: 100%; background: <?php echo e(($quest['status'] ?? '') === 'failed' ? '#dc2626' : '#16a34a'); ?>;"></span></div>
+                                                <p style="margin-top:0.35rem;font-size:0.8rem;color:var(--muted);">Reward: +<?php echo e($quest['reward_xp']); ?> XP • Status: <?php echo e(($quest['status'] ?? '') === 'failed' ? '❌ Failed' : '✅ Completed'); ?></p>
                                             </div>
                                         <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); if ($__empty_1): ?>
-                                            <div class="placeholder">Belum ada quest yang selesai.</div>
+                                            <div class="placeholder">Belum ada quest yang selesai atau gagal.</div>
                                         <?php endif; ?>
                                     </div>
                                 </article>
@@ -2069,7 +2031,7 @@
 
                                 <article class="card panel" style="grid-column: 1 / -1;">
                                     <h2>📜 Quest Tersedia</h2>
-                                    <p>Pilih quest yang ingin diselesaikan lewat transaksi.</p>
+                                    <p>Quest manual dibuka lewat transaksi, sedangkan quest auto bisa langsung di-join dari sini.</p>
                                     <div class="quest-list">
                                         <?php $__empty_1 = true; $__currentLoopData = ($questAvailableTemplates ?? collect()); $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $questTpl): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); $__empty_1 = false; ?>
                                             <div class="quest-card">
@@ -2077,14 +2039,23 @@
                                                 <p><?php echo e($questTpl['description']); ?></p>
                                                 <?php
                                                     $questFlowLabel = ($questTpl['flow'] ?? 'both') === 'income' ? 'Income' : (($questTpl['flow'] ?? 'both') === 'expense' ? 'Expense' : 'General');
+                                                    $questModeLabel = ($questTpl['mode'] ?? 'auto') === 'manual' ? '📝 Manual' : '⚡ Auto';
                                                 ?>
-                                                <p style="margin-top:0.35rem;font-size:0.8rem;color:var(--muted);">Reward: +<?php echo e($questTpl['reward_xp']); ?> XP • Tipe: <?php echo e($questFlowLabel); ?> • Durasi: <?php echo e($questTpl['duration_days']); ?> hari</p>
+                                                <p style="margin-top:0.35rem;font-size:0.8rem;color:var(--muted);">Reward: +<?php echo e($questTpl['reward_xp']); ?> XP • <?php echo e($questModeLabel); ?> • Tipe: <?php echo e($questFlowLabel); ?> • Durasi: <?php echo e($questTpl['duration_days']); ?> hari</p>
                                                 <div class="row-actions" style="margin-top:0.55rem;">
-                                                    <a href="<?php echo e(route('dashboard.transactions', ['mode' => 'quest', 'quest_key' => $questTpl['key']])); ?>" class="btn btn-soft" style="text-decoration:none;display:inline-flex;align-items:center;">Pilih Quest</a>
+                                                    <?php if(($questTpl['mode'] ?? 'auto') === 'auto'): ?>
+                                                        <form action="<?php echo e(route('dashboard.quests.join')); ?>" method="POST">
+                                                            <?php echo csrf_field(); ?>
+                                                            <input type="hidden" name="quest_key" value="<?php echo e($questTpl['key']); ?>">
+                                                            <button type="submit" class="btn btn-primary">Join Quest</button>
+                                                        </form>
+                                                    <?php else: ?>
+                                                        <a href="<?php echo e(route('dashboard.transactions', ['mode' => 'quest', 'quest_key' => $questTpl['key']])); ?>" class="btn btn-soft" style="text-decoration:none;display:inline-flex;align-items:center;">Buka di Transaksi</a>
+                                                    <?php endif; ?>
                                                 </div>
                                             </div>
                                         <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); if ($__empty_1): ?>
-                                            <div class="placeholder">Semua quest sedang aktif atau belum ada template quest.</div>
+                                            <div class="placeholder">Belum ada quest aktif. Nanti admin yang akan menambah quest untuk user.</div>
                                         <?php endif; ?>
                                     </div>
                                 </article>
@@ -2093,7 +2064,7 @@
                             <section class="hero card">
                                 <div>
                                     <h1>Fitur Badges</h1>
-                                    <p>Badge diberikan saat milestone finansial atau challenge tercapai, dan progres menuju badge berikutnya bisa kamu pantau di sini.</p>
+                                    <p>Badge diberikan saat milestone finansial atau quest tercapai, dan progres menuju badge berikutnya bisa kamu pantau di sini.</p>
                                 </div>
                                 <div class="hero-pill">
                                     <strong><?php echo e(number_format($totalXp, 0, ',', '.')); ?> XP</strong>
@@ -2104,7 +2075,7 @@
                             <section class="layout">
                                 <article class="card panel" style="grid-column: 1 / -1;">
                                     <h2>Badge yang Sudah Diraih</h2>
-                                    <p>Badges diperoleh dari milestone dan challenge yang berhasil diselesaikan.</p>
+                                    <p>Badges diperoleh dari milestone dan quest yang berhasil diselesaikan.</p>
                                     <div class="feature-grid">
                                         <?php $__empty_1 = true; $__currentLoopData = $userBadges ?? collect(); $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $ub): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); $__empty_1 = false; ?>
                                             <article class="card feature-item" style="border: 2px solid #fbbf24; position:relative;">
@@ -2114,7 +2085,7 @@
                                                 <p style="font-size:0.75rem;margin-top:0.5rem;color:var(--muted);"><?php echo e($ub->earned_at ? \Illuminate\Support\Carbon::parse($ub->earned_at)->format('d M Y') : 'Acquired'); ?></p>
                                             </article>
                                         <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); if ($__empty_1): ?>
-                                            <div class="placeholder" style="grid-column: 1 / -1;">Belum ada badge yang diraih. Mulai dari transaction pertama atau challenge untuk unlock badge!</div>
+                                            <div class="placeholder" style="grid-column: 1 / -1;">Belum ada badge yang diraih. Mulai dari transaction pertama atau quest untuk unlock badge!</div>
                                         <?php endif; ?>
                                     </div>
                                 </article>
@@ -2151,7 +2122,7 @@
                             <section class="hero card">
                                 <div>
                                     <h1>Fitur Leaderboard</h1>
-                                    <p>Ranking pengguna paling aktif dan paling rajin berdasarkan aktivitas finansial, streak, progres goal, challenge, dan XP.</p>
+                                    <p>Ranking pengguna paling aktif dan paling rajin berdasarkan aktivitas finansial, streak, progres goal, quest, dan XP.</p>
                                 </div>
                                 <div class="hero-pill">
                                     <strong><?php echo e(($leaderboardRows ?? collect())->count()); ?></strong>
@@ -2162,7 +2133,7 @@
                             <section class="layout">
                                 <article class="card panel" style="grid-column: 1 / -1;">
                                     <h2>Ranking Aktivitas FinCo</h2>
-                                    <p>Skor dihitung dari transaksi, hari aktif, streak, progres goals, challenge selesai, dan total XP.</p>
+                                    <p>Skor dihitung dari transaksi, hari aktif, streak, progres goals, quest selesai, dan total XP.</p>
 
                                     <div class="leaderboard-wrap" style="margin-top:0.7rem;">
                                         <table class="leaderboard-table">
@@ -2280,8 +2251,164 @@
             </main>
         </div>
     </div>
+
+    <!-- Quest Picker Modal -->
+    <div id="questPickerModal" style="display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.5);z-index:9999;overflow-y:auto;padding:2rem 0;">
+        <div style="max-width:600px;margin:2rem auto;background:#fff;border-radius:12px;box-shadow:0 20px 60px rgba(0,0,0,0.3);padding:0;animation:slideUp 0.3s ease;">
+            <div style="padding:2rem;border-bottom:1px solid #e5e7eb;display:flex;align-items:center;justify-content:space-between;">
+                <h2 style="margin:0;font-size:1.5rem;color:#132b4a;">🎯 Pilih Transaction Quest</h2>
+                <button type="button" id="closeQuestModal" style="background:none;border:none;font-size:2rem;cursor:pointer;color:#9ca3af;">&times;</button>
+            </div>
+            <div id="questModalContent" style="padding:1.5rem;max-height:500px;overflow-y:auto;">
+                <p style="color:#6b7280;margin-top:0;">Memuat quest yang tersedia...</p>
+            </div>
+            <div style="padding:1.5rem;border-top:1px solid #e5e7eb;display:flex;gap:0.75rem;justify-content:flex-end;">
+                <button type="button" id="cancelQuestModal" class="btn btn-soft">Batal</button>
+            </div>
+        </div>
+    </div>
+
+    <style>
+        @keyframes slideUp {
+            from {
+                transform: translateY(20px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+        .quest-option {
+            padding:1rem;
+            border:2px solid #e5e7eb;
+            border-radius:8px;
+            cursor:pointer;
+            margin-bottom:1rem;
+            transition:all 0.2s;
+        }
+        .quest-option:hover {
+            border-color:#3b82f6;
+            background:#f0f9ff;
+        }
+        .quest-option.selected {
+            border-color:#3b82f6;
+            background:#dbeafe;
+        }
+        .quest-option h3 {
+            margin:0 0 0.5rem 0;
+            color:#1f2937;
+            font-size:1rem;
+        }
+        .quest-option p {
+            margin:0.25rem 0;
+            color:#6b7280;
+            font-size:0.875rem;
+        }
+    </style>
+
     <script>
         document.addEventListener('DOMContentLoaded', function () {
+            // Quest Picker Modal
+            const openQuestModalBtn = document.getElementById('openQuestModalBtn');
+            const questPickerModal = document.getElementById('questPickerModal');
+            const closeQuestModal = document.getElementById('closeQuestModal');
+            const cancelQuestModal = document.getElementById('cancelQuestModal');
+            const questModalContent = document.getElementById('questModalContent');
+            const questForm = document.getElementById('questForm');
+            
+            // Manual quest templates passed from controller
+            const manualQuestTemplates = <?php echo json_encode($manualQuestTemplates ?? []); ?>;
+            
+            function openQuestModal() {
+                // Render quest picker
+                const html = manualQuestTemplates.map(qt => `
+                    <div class="quest-option" data-quest-key="${qt.key}" style="cursor:pointer;">
+                        <h3>${qt.name}</h3>
+                        <p>${qt.description}</p>
+                        <p style="color:#9ca3af;font-size:0.8rem;">Reward: +${qt.reward_xp} XP • Tipe: ${qt.flow === 'expense' ? 'Expense' : 'Income'} • Durasi: ${qt.duration_days} hari</p>
+                    </div>
+                `).join('');
+                
+                questModalContent.innerHTML = html || '<p style="color:#9ca3af;">Belum ada quest manual yang tersedia.</p>';
+                
+                // Attach click handlers to quest options
+                document.querySelectorAll('.quest-option[data-quest-key]').forEach(el => {
+                    el.addEventListener('click', selectQuest);
+                });
+                
+                questPickerModal.style.display = 'flex';
+                questPickerModal.style.flexDirection = 'column';
+                questPickerModal.style.justifyContent = 'center';
+            }
+            
+            function closeQuestPickerModal() {
+                questPickerModal.style.display = 'none';
+            }
+            
+            function selectQuest(event) {
+                const option = event.currentTarget;
+                const questKey = option.dataset.questKey;
+                const questTemplate = manualQuestTemplates.find(qt => qt.key === questKey);
+                
+                if (!questTemplate) return;
+                
+                // Update quest form with selected quest
+                if (questForm) {
+                    const modeInput = questForm.querySelector('input[name="mode"]');
+                    const questKeyInput = questForm.querySelector('input[name="quest_key"]');
+                    const typeInput = questForm.querySelector('input[name="type"]');
+                    const categoryInput = questForm.querySelector('input[name="category_id"]');
+                    const amountInput = document.getElementById('quest_amount');
+                    const dateInput = document.getElementById('quest_date');
+                    const descInput = document.getElementById('quest_desc');
+                    
+                    if (modeInput) modeInput.value = 'quest';
+                    if (questKeyInput) questKeyInput.value = questKey;
+                    if (typeInput) typeInput.value = questTemplate.flow === 'expense' ? 'expense' : 'income';
+                    if (categoryInput) categoryInput.value = '<?php echo e($questSelectedCategoryId ?? ""); ?>';
+                    
+                    // Enable form inputs
+                    if (amountInput) amountInput.disabled = false;
+                    if (dateInput) dateInput.disabled = false;
+                    if (descInput) descInput.disabled = false;
+                    
+                    // Update locked displays
+                    const lockedType = questForm.querySelector('#questLockedType');
+                    const lockedCategory = questForm.querySelector('#questLockedCategory');
+                    const questDisplayHeader = questForm.querySelector('.locked-category');
+                    
+                    if (lockedType) lockedType.textContent = questTemplate.flow === 'expense' ? 'Expense' : 'Income';
+                    if (lockedCategory) lockedCategory.textContent = '🔒 ' + (questTemplate.category_name || 'General');
+                    if (questDisplayHeader) {
+                        questDisplayHeader.textContent = questTemplate.name + ' • (📝 Manual) • Tipe: ' + (questTemplate.flow === 'expense' ? 'Expense' : 'Income');
+                    }
+                    
+                    // Scroll to quest form
+                    questForm.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }
+                
+                closeQuestPickerModal();
+            }
+            
+            // Event listeners
+            if (openQuestModalBtn) {
+                openQuestModalBtn.addEventListener('click', openQuestModal);
+            }
+            if (closeQuestModal) {
+                closeQuestModal.addEventListener('click', closeQuestPickerModal);
+            }
+            if (cancelQuestModal) {
+                cancelQuestModal.addEventListener('click', closeQuestPickerModal);
+            }
+            
+            // Close modal on outside click
+            questPickerModal.addEventListener('click', function(e) {
+                if (e.target === questPickerModal) {
+                    closeQuestPickerModal();
+                }
+            });
+
             const typeSelect = document.getElementById('trx_type');
             const categorySelect = document.getElementById('trx_category');
 
