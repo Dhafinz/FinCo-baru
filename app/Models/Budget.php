@@ -29,6 +29,11 @@ class Budget extends Model
         return $this->belongsTo(User::class);
     }
 
+    public function categoryEntity()
+    {
+        return $this->belongsTo(Category::class, 'category_id');
+    }
+
     public function percentageUsed(): float
     {
         if ($this->limit_amount <= 0) {

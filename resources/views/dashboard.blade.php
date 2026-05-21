@@ -1101,6 +1101,9 @@
                 <li><a href="{{ route('dashboard.friends') }}">Teman <small>baru</small></a></li>
                 <li><a class="{{ ($activeFeature ?? '') === 'reports' ? 'active' : '' }}" href="{{ route('dashboard.reports') }}">Laporan <small>fitur</small></a></li>
                 <li><a class="{{ ($activeFeature ?? '') === 'settings' ? 'active' : '' }}" href="{{ route('dashboard.settings') }}">Pengaturan <small>fitur</small></a></li>
+                @if($user->isAdmin())
+                    <li><a class="{{ ($activeFeature ?? '') === 'admin' ? 'active' : '' }}" href="{{ route('admin.dashboard') }}">Panel Admin <small>admin</small></a></li>
+                @endif
             </ul>
         </aside>
 

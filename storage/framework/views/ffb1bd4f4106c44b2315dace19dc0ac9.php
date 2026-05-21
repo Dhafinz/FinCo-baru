@@ -1101,6 +1101,9 @@
                 <li><a href="<?php echo e(route('dashboard.friends')); ?>">Teman <small>baru</small></a></li>
                 <li><a class="<?php echo e(($activeFeature ?? '') === 'reports' ? 'active' : ''); ?>" href="<?php echo e(route('dashboard.reports')); ?>">Laporan <small>fitur</small></a></li>
                 <li><a class="<?php echo e(($activeFeature ?? '') === 'settings' ? 'active' : ''); ?>" href="<?php echo e(route('dashboard.settings')); ?>">Pengaturan <small>fitur</small></a></li>
+                <?php if($user->isAdmin()): ?>
+                    <li><a class="<?php echo e(($activeFeature ?? '') === 'admin' ? 'active' : ''); ?>" href="<?php echo e(route('admin.dashboard')); ?>">Panel Admin <small>admin</small></a></li>
+                <?php endif; ?>
             </ul>
         </aside>
 
