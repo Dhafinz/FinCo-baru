@@ -1,27 +1,28 @@
-<?php $__env->startSection('title', 'Dashboard'); ?>
-<?php $__env->startSection('breadcrumb', 'Dashboard'); ?>
+@extends('admin.layouts.admin')
 
-<?php $__env->startPush('styles'); ?>
+@section('title', 'Dashboard')
+@section('breadcrumb', 'Dashboard')
+
+@push('styles')
 <style>
 .chart-container canvas { max-height: 260px; }
 </style>
-<?php $__env->stopPush(); ?>
+@endpush
 
-<?php $__env->startSection('content'); ?>
+@section('content')
 <div class="stat-cards">
     <div class="stat-card">
         <div class="stat-card-top">
             <div class="stat-card-icon blue">
                 <svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
             </div>
-            <span class="stat-card-trend <?php echo e($stats['users_trend'] >= 0 ? 'up' : 'down'); ?>">
+            <span class="stat-card-trend {{ $stats['users_trend'] >= 0 ? 'up' : 'down' }}">
                 <svg viewBox="0 0 24 24"><polyline points="18 15 12 9 6 15"/></svg>
-                <?php echo e($stats['users_trend']); ?>
-
+                {{ $stats['users_trend'] }}
             </span>
         </div>
         <div class="stat-card-label">Total Pengguna</div>
-        <div class="stat-card-value"><?php echo e(number_format($stats['users'])); ?></div>
+        <div class="stat-card-value">{{ number_format($stats['users']) }}</div>
     </div>
 
     <div class="stat-card">
@@ -29,14 +30,13 @@
             <div class="stat-card-icon green">
                 <svg viewBox="0 0 24 24"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
             </div>
-            <span class="stat-card-trend <?php echo e($stats['transactions_trend'] >= 0 ? 'up' : 'down'); ?>">
+            <span class="stat-card-trend {{ $stats['transactions_trend'] >= 0 ? 'up' : 'down' }}">
                 <svg viewBox="0 0 24 24"><polyline points="18 15 12 9 6 15"/></svg>
-                <?php echo e($stats['transactions_trend']); ?>
-
+                {{ $stats['transactions_trend'] }}
             </span>
         </div>
         <div class="stat-card-label">Total Transaksi</div>
-        <div class="stat-card-value"><?php echo e(number_format($stats['transactions'])); ?></div>
+        <div class="stat-card-value">{{ number_format($stats['transactions']) }}</div>
     </div>
 
     <div class="stat-card">
@@ -44,14 +44,13 @@
             <div class="stat-card-icon orange">
                 <svg viewBox="0 0 24 24"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
             </div>
-            <span class="stat-card-trend <?php echo e($stats['budgets_trend'] >= 0 ? 'up' : 'down'); ?>">
+            <span class="stat-card-trend {{ $stats['budgets_trend'] >= 0 ? 'up' : 'down' }}">
                 <svg viewBox="0 0 24 24"><polyline points="18 15 12 9 6 15"/></svg>
-                <?php echo e($stats['budgets_trend']); ?>
-
+                {{ $stats['budgets_trend'] }}
             </span>
         </div>
         <div class="stat-card-label">Total Anggaran</div>
-        <div class="stat-card-value"><?php echo e(number_format($stats['budgets'])); ?></div>
+        <div class="stat-card-value">{{ number_format($stats['budgets']) }}</div>
     </div>
 
     <div class="stat-card">
@@ -65,7 +64,7 @@
             </span>
         </div>
         <div class="stat-card-label">Total Kategori</div>
-        <div class="stat-card-value"><?php echo e(number_format($stats['categories'])); ?></div>
+        <div class="stat-card-value">{{ number_format($stats['categories']) }}</div>
     </div>
 </div>
 
@@ -85,7 +84,7 @@
     <div class="activity-card">
         <div class="activity-card-header">
             <h3>Aktivitas Terbaru</h3>
-            <a href="<?php echo e(route('admin.transactions.index')); ?>">Lihat Semua</a>
+            <a href="{{ route('admin.transactions.index') }}">Lihat Semua</a>
         </div>
         <table class="activity-table">
             <thead>
@@ -97,45 +96,42 @@
                 </tr>
             </thead>
             <tbody>
-                <?php $__empty_1 = true; $__currentLoopData = $recentTransactions; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $t): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); $__empty_1 = false; ?>
+                @forelse ($recentTransactions as $t)
                 <tr>
                     <td>
                         <div class="activity-user">
-                            <div class="activity-user-avatar" style="background: <?php echo e(['#2563eb','#10b981','#f59e0b','#6366f1','#ef4444','#0d9488'][rand(0,5)]); ?>">
-                                <?php echo e(strtoupper(substr($t['user_name'], 0, 1))); ?>
-
+                            <div class="activity-user-avatar" style="background: {{ ['#2563eb','#10b981','#f59e0b','#6366f1','#ef4444','#0d9488'][rand(0,5)] }}">
+                                {{ strtoupper(substr($t['user_name'], 0, 1)) }}
                             </div>
-                            <span class="activity-user-name"><?php echo e($t['user_name']); ?></span>
+                            <span class="activity-user-name">{{ $t['user_name'] }}</span>
                         </div>
                     </td>
                     <td>
-                        <span class="activity-type <?php echo e($t['type']); ?>">
-                            <?php if($t['type'] === 'income'): ?>
+                        <span class="activity-type {{ $t['type'] }}">
+                            @if ($t['type'] === 'income')
                             <svg viewBox="0 0 24 24"><polyline points="7 17 17 7"/><polyline points="7 7 17 7 17 17"/></svg>
-                            <?php else: ?>
+                            @else
                             <svg viewBox="0 0 24 24"><polyline points="17 7 7 17"/><polyline points="17 17 7 17 7 7"/></svg>
-                            <?php endif; ?>
-                            <?php echo e($t['type'] === 'income' ? 'Pemasukan' : 'Pengeluaran'); ?>
-
+                            @endif
+                            {{ $t['type'] === 'income' ? 'Pemasukan' : 'Pengeluaran' }}
                         </span>
                     </td>
                     <td>
-                        <span class="activity-amount <?php echo e($t['type']); ?>">
-                            Rp <?php echo e(number_format($t['amount'], 0, ',', '.')); ?>
-
+                        <span class="activity-amount {{ $t['type'] }}">
+                            Rp {{ number_format($t['amount'], 0, ',', '.') }}
                         </span>
                     </td>
                     <td>
-                        <span class="activity-date"><?php echo e($t['date']); ?></span>
+                        <span class="activity-date">{{ $t['date'] }}</span>
                     </td>
                 </tr>
-                <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); if ($__empty_1): ?>
+                @empty
                 <tr>
                     <td colspan="4" style="text-align:center;padding:32px;color:var(--text-muted)">
                         Belum ada transaksi terbaru
                     </td>
                 </tr>
-                <?php endif; ?>
+                @endforelse
             </tbody>
         </table>
     </div>
@@ -162,54 +158,54 @@
             </div>
         </div>
         <div class="quick-grid">
-            <a class="quick-card" href="<?php echo e(route('admin.users.index')); ?>">
+            <a class="quick-card" href="{{ route('admin.users.index') }}">
                 <div class="quick-card-icon blue">
                     <svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>
                 </div>
                 <span class="quick-card-label">Users</span>
-                <span class="quick-card-count"><?php echo e(number_format($stats['users'])); ?> pengguna</span>
+                <span class="quick-card-count">{{ number_format($stats['users']) }} pengguna</span>
             </a>
-            <a class="quick-card" href="<?php echo e(route('admin.transactions.index')); ?>">
+            <a class="quick-card" href="{{ route('admin.transactions.index') }}">
                 <div class="quick-card-icon green">
                     <svg viewBox="0 0 24 24"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
                 </div>
                 <span class="quick-card-label">Transaksi</span>
-                <span class="quick-card-count"><?php echo e(number_format($stats['transactions'])); ?> transaksi</span>
+                <span class="quick-card-count">{{ number_format($stats['transactions']) }} transaksi</span>
             </a>
-            <a class="quick-card" href="<?php echo e(route('admin.categories.index')); ?>">
+            <a class="quick-card" href="{{ route('admin.categories.index') }}">
                 <div class="quick-card-icon purple">
                     <svg viewBox="0 0 24 24"><path d="M4 4h5l2 2h9v2H4V4z"/><path d="M4 10h16v10H4V10z"/></svg>
                 </div>
                 <span class="quick-card-label">Kategori</span>
-                <span class="quick-card-count"><?php echo e(number_format($stats['categories'])); ?> kategori</span>
+                <span class="quick-card-count">{{ number_format($stats['categories']) }} kategori</span>
             </a>
-            <a class="quick-card" href="<?php echo e(route('admin.budgets.index')); ?>">
+            <a class="quick-card" href="{{ route('admin.budgets.index') }}">
                 <div class="quick-card-icon orange">
                     <svg viewBox="0 0 24 24"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
                 </div>
                 <span class="quick-card-label">Anggaran</span>
-                <span class="quick-card-count"><?php echo e(number_format($stats['budgets'])); ?> anggaran</span>
+                <span class="quick-card-count">{{ number_format($stats['budgets']) }} anggaran</span>
             </a>
-            <a class="quick-card" href="<?php echo e(route('admin.goals.index')); ?>">
+            <a class="quick-card" href="{{ route('admin.goals.index') }}">
                 <div class="quick-card-icon teal">
                     <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg>
                 </div>
                 <span class="quick-card-label">Goals</span>
-                <span class="quick-card-count"><?php echo e(number_format($stats['goals'])); ?> goals</span>
+                <span class="quick-card-count">{{ number_format($stats['goals']) }} goals</span>
             </a>
-            <a class="quick-card" href="<?php echo e(route('admin.quests.index')); ?>">
+            <a class="quick-card" href="{{ route('admin.quests.index') }}">
                 <div class="quick-card-icon red">
                     <svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
                 </div>
                 <span class="quick-card-label">Quests</span>
-                <span class="quick-card-count"><?php echo e(number_format($stats['quests'])); ?> quests</span>
+                <span class="quick-card-count">{{ number_format($stats['quests']) }} quests</span>
             </a>
         </div>
     </div>
 </div>
-<?php $__env->stopSection(); ?>
+@endsection
 
-<?php $__env->startPush('scripts'); ?>
+@push('scripts')
 <script>
 document.addEventListener('DOMContentLoaded', function () {
     const isDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
@@ -219,11 +215,11 @@ document.addEventListener('DOMContentLoaded', function () {
     new Chart(document.getElementById('financeChart'), {
         type: 'bar',
         data: {
-            labels: <?php echo json_encode($monthlyLabels, 15, 512) ?>,
+            labels: @json($monthlyLabels),
             datasets: [
                 {
                     label: 'Pemasukan',
-                    data: <?php echo json_encode($monthlyIncome, 15, 512) ?>,
+                    data: @json($monthlyIncome),
                     backgroundColor: 'rgba(37, 99, 235, 0.8)',
                     borderColor: '#2563eb',
                     borderWidth: 0,
@@ -232,7 +228,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 },
                 {
                     label: 'Pengeluaran',
-                    data: <?php echo json_encode($monthlyExpense, 15, 512) ?>,
+                    data: @json($monthlyExpense),
                     backgroundColor: 'rgba(239, 68, 68, 0.7)',
                     borderColor: '#ef4444',
                     borderWidth: 0,
@@ -307,9 +303,9 @@ document.addEventListener('DOMContentLoaded', function () {
     new Chart(document.getElementById('categoryChart'), {
         type: 'doughnut',
         data: {
-            labels: <?php echo json_encode($categoryDistribution->pluck('name'), 15, 512) ?>,
+            labels: @json($categoryDistribution->pluck('name')),
             datasets: [{
-                data: <?php echo json_encode($categoryDistribution->pluck('count'), 15, 512) ?>,
+                data: @json($categoryDistribution->pluck('count')),
                 backgroundColor: [
                     '#2563eb', '#10b981', '#f59e0b', '#6366f1',
                     '#ef4444', '#0d9488', '#8b5cf6', '#ec4899',
@@ -349,6 +345,4 @@ document.addEventListener('DOMContentLoaded', function () {
     });
 });
 </script>
-<?php $__env->stopPush(); ?>
-
-<?php echo $__env->make('admin.layouts.admin', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?><?php /**PATH C:\finco\resources\views/admin/dashboard.blade.php ENDPATH**/ ?>
+@endpush

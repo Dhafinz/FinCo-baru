@@ -11,10 +11,10 @@ use App\Http\Controllers\Admin\CategoryController as AdminCategoryController;
 use App\Http\Controllers\Admin\DashboardController as AdminDashboardController;
 use App\Http\Controllers\Admin\GamificationController as AdminGamificationController;
 use App\Http\Controllers\Admin\GoalController as AdminGoalController;
+use App\Http\Controllers\Admin\QuestController as AdminQuestController;
 use App\Http\Controllers\Admin\ReportController as AdminReportController;
 use App\Http\Controllers\Admin\TransactionController as AdminTransactionController;
 use App\Http\Controllers\Admin\UserController as AdminUserController;
-use App\Http\Controllers\Admin\QuestController as AdminQuestController;
 
 use Illuminate\Support\Facades\Route;
 
@@ -29,50 +29,61 @@ Route::middleware(['auth'])->group(function () {
     Route::put('/dashboard/transactions/{transaction}', [UserDashboardController::class, 'updateTransaction'])->name('dashboard.transactions.update');
     Route::delete('/dashboard/transactions/{transaction}', [UserDashboardController::class, 'destroyTransaction'])->name('dashboard.transactions.destroy');
 
-Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(function () {
-    Route::get('/', [AdminDashboardController::class, 'index'])->name('dashboard');
+    Route::middleware(['admin'])->prefix('admin')->name('admin.')->group(function () {
+        Route::get('/', [AdminDashboardController::class, 'index'])->name('dashboard');
 
-    Route::get('/transactions', [AdminTransactionController::class, 'index'])->name('transactions.index');
-    Route::get('/transactions/create', [AdminTransactionController::class, 'create'])->name('transactions.create');
-    Route::post('/transactions', [AdminTransactionController::class, 'store'])->name('transactions.store');
-    Route::get('/transactions/{transaction}/edit', [AdminTransactionController::class, 'edit'])->name('transactions.edit');
-    Route::put('/transactions/{transaction}', [AdminTransactionController::class, 'update'])->name('transactions.update');
-    Route::delete('/transactions/{transaction}', [AdminTransactionController::class, 'destroy'])->name('transactions.destroy');
+        Route::get('/users', [AdminUserController::class, 'index'])->name('users.index');
+        Route::get('/users/create', [AdminUserController::class, 'create'])->name('users.create');
+        Route::post('/users', [AdminUserController::class, 'store'])->name('users.store');
+        Route::get('/users/{user}/edit', [AdminUserController::class, 'edit'])->name('users.edit');
+        Route::put('/users/{user}', [AdminUserController::class, 'update'])->name('users.update');
+        Route::delete('/users/{user}', [AdminUserController::class, 'destroy'])->name('users.destroy');
 
-    Route::get('/users', [AdminUserController::class, 'index'])->name('users.index');
+        Route::get('/transactions', [AdminTransactionController::class, 'index'])->name('transactions.index');
+        Route::get('/transactions/create', [AdminTransactionController::class, 'create'])->name('transactions.create');
+        Route::post('/transactions', [AdminTransactionController::class, 'store'])->name('transactions.store');
+        Route::get('/transactions/{transaction}/edit', [AdminTransactionController::class, 'edit'])->name('transactions.edit');
+        Route::put('/transactions/{transaction}', [AdminTransactionController::class, 'update'])->name('transactions.update');
+        Route::delete('/transactions/{transaction}', [AdminTransactionController::class, 'destroy'])->name('transactions.destroy');
 
-    Route::get('/categories', [AdminCategoryController::class, 'index'])->name('categories.index');
-    Route::post('/categories', [AdminCategoryController::class, 'store'])->name('categories.store');
-    Route::put('/categories/{category}', [AdminCategoryController::class, 'update'])->name('categories.update');
-    Route::delete('/categories/{category}', [AdminCategoryController::class, 'destroy'])->name('categories.destroy');
+        Route::get('/categories', [AdminCategoryController::class, 'index'])->name('categories.index');
+        Route::get('/categories/create', [AdminCategoryController::class, 'create'])->name('categories.create');
+        Route::post('/categories', [AdminCategoryController::class, 'store'])->name('categories.store');
+        Route::get('/categories/{category}/edit', [AdminCategoryController::class, 'edit'])->name('categories.edit');
+        Route::put('/categories/{category}', [AdminCategoryController::class, 'update'])->name('categories.update');
+        Route::delete('/categories/{category}', [AdminCategoryController::class, 'destroy'])->name('categories.destroy');
 
-    Route::get('/budgets', [AdminBudgetController::class, 'index'])->name('budgets.index');
-    Route::post('/budgets', [AdminBudgetController::class, 'store'])->name('budgets.store');
-    Route::put('/budgets/{budget}', [AdminBudgetController::class, 'update'])->name('budgets.update');
-    Route::delete('/budgets/{budget}', [AdminBudgetController::class, 'destroy'])->name('budgets.destroy');
+        Route::get('/budgets', [AdminBudgetController::class, 'index'])->name('budgets.index');
+        Route::get('/budgets/create', [AdminBudgetController::class, 'create'])->name('budgets.create');
+        Route::post('/budgets', [AdminBudgetController::class, 'store'])->name('budgets.store');
+        Route::get('/budgets/{budget}/edit', [AdminBudgetController::class, 'edit'])->name('budgets.edit');
+        Route::put('/budgets/{budget}', [AdminBudgetController::class, 'update'])->name('budgets.update');
+        Route::delete('/budgets/{budget}', [AdminBudgetController::class, 'destroy'])->name('budgets.destroy');
 
-    Route::get('/goals', [AdminGoalController::class, 'index'])->name('goals.index');
-    Route::post('/goals', [AdminGoalController::class, 'store'])->name('goals.store');
-    Route::put('/goals/{goal}', [AdminGoalController::class, 'update'])->name('goals.update');
-    Route::delete('/goals/{goal}', [AdminGoalController::class, 'destroy'])->name('goals.destroy');
+        Route::get('/goals', [AdminGoalController::class, 'index'])->name('goals.index');
+        Route::get('/goals/create', [AdminGoalController::class, 'create'])->name('goals.create');
+        Route::post('/goals', [AdminGoalController::class, 'store'])->name('goals.store');
+        Route::get('/goals/{goal}/edit', [AdminGoalController::class, 'edit'])->name('goals.edit');
+        Route::put('/goals/{goal}', [AdminGoalController::class, 'update'])->name('goals.update');
+        Route::delete('/goals/{goal}', [AdminGoalController::class, 'destroy'])->name('goals.destroy');
 
-    Route::get('/quests', [AdminQuestController::class, 'index'])->name('quests.index');
-    Route::get('/quests/create', [AdminQuestController::class, 'create'])->name('quests.create');
-    Route::post('/quests', [AdminQuestController::class, 'store'])->name('quests.store');
-    Route::get('/quests/{quest}/edit', [AdminQuestController::class, 'edit'])->name('quests.edit');
-    Route::put('/quests/{quest}', [AdminQuestController::class, 'update'])->name('quests.update');
-    Route::delete('/quests/{quest}', [AdminQuestController::class, 'destroy'])->name('quests.destroy');
+        Route::get('/quests', [AdminQuestController::class, 'index'])->name('quests.index');
+        Route::get('/quests/create', [AdminQuestController::class, 'create'])->name('quests.create');
+        Route::post('/quests', [AdminQuestController::class, 'store'])->name('quests.store');
+        Route::get('/quests/{quest}/edit', [AdminQuestController::class, 'edit'])->name('quests.edit');
+        Route::put('/quests/{quest}', [AdminQuestController::class, 'update'])->name('quests.update');
+        Route::delete('/quests/{quest}', [AdminQuestController::class, 'destroy'])->name('quests.destroy');
 
-    Route::get('/badges', [AdminBadgeController::class, 'index'])->name('badges.index');
-    Route::get('/badges/create', [AdminBadgeController::class, 'create'])->name('badges.create');
-    Route::post('/badges', [AdminBadgeController::class, 'store'])->name('badges.store');
-    Route::get('/badges/{badge}/edit', [AdminBadgeController::class, 'edit'])->name('badges.edit');
-    Route::put('/badges/{badge}', [AdminBadgeController::class, 'update'])->name('badges.update');
-    Route::delete('/badges/{badge}', [AdminBadgeController::class, 'destroy'])->name('badges.destroy');
+        Route::get('/badges', [AdminBadgeController::class, 'index'])->name('badges.index');
+        Route::get('/badges/create', [AdminBadgeController::class, 'create'])->name('badges.create');
+        Route::post('/badges', [AdminBadgeController::class, 'store'])->name('badges.store');
+        Route::get('/badges/{badge}/edit', [AdminBadgeController::class, 'edit'])->name('badges.edit');
+        Route::put('/badges/{badge}', [AdminBadgeController::class, 'update'])->name('badges.update');
+        Route::delete('/badges/{badge}', [AdminBadgeController::class, 'destroy'])->name('badges.destroy');
 
-    Route::get('/gamification', [AdminGamificationController::class, 'index'])->name('gamification.index');
-    Route::get('/reports', [AdminReportController::class, 'index'])->name('reports.index');
-});
+        Route::get('/gamification', [AdminGamificationController::class, 'index'])->name('gamification.index');
+        Route::get('/reports', [AdminReportController::class, 'index'])->name('reports.index');
+    });
     
     Route::get('/dashboard/budgets', [UserDashboardController::class, 'budgets'])->name('dashboard.budgets');
     Route::post('/dashboard/budgets', [UserDashboardController::class, 'storeBudget'])->name('dashboard.budgets.store');

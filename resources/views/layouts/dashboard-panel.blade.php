@@ -144,9 +144,6 @@
         <p>Akses cepat semua fitur FinCo.</p>
         <ul class="menu">
             <li><a class="{{ ($menuActive ?? '') === 'overview' ? 'active' : '' }}" href="{{ route('dashboard') }}">Overview <small>aktif</small></a></li>
-            @if($user->isAdmin())
-                <li><a class="{{ ($menuActive ?? '') === 'admin' ? 'active' : '' }}" href="{{ route('admin.dashboard') }}">Panel Admin <small>admin</small></a></li>
-            @endif
             <li><a class="{{ ($menuActive ?? '') === 'transactions' ? 'active' : '' }}" href="{{ route('dashboard.transactions') }}">Transaksi <small>fitur</small></a></li>
             <li><a class="{{ ($menuActive ?? '') === 'budgets' ? 'active' : '' }}" href="{{ route('dashboard.budgets') }}">Budget <small>fitur</small></a></li>
             <li><a class="{{ ($menuActive ?? '') === 'goals' ? 'active' : '' }}" href="{{ route('dashboard.goals') }}">Goals <small>fitur</small></a></li>
@@ -158,7 +155,7 @@
             <li><a class="{{ ($menuActive ?? '') === 'reports' ? 'active' : '' }}" href="{{ route('dashboard.reports') }}">Laporan <small>fitur</small></a></li>
             <li><a class="{{ ($menuActive ?? '') === 'settings' ? 'active' : '' }}" href="{{ route('dashboard.settings') }}">Pengaturan <small>fitur</small></a></li>
             @if($user->isAdmin())
-                <li><a class="{{ ($menuActive ?? '') === 'admin' ? 'active' : '' }}" href="{{ route('admin.dashboard') }}">Admin Panel <small>admin</small></a></li>
+                 <li><a class="{{ ($menuActive ?? '') === 'admin' ? 'active' : '' }}" href="{{ route('admin.dashboard') }}">Dashboard Admin <small>admin</small></a></li>
             @endif
         </ul>
     </aside>
