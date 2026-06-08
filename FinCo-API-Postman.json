@@ -1,0 +1,263 @@
+{
+  "info": {
+    "name": "FinCo API",
+    "description": "Dokumentasi API FinCo — Aplikasi Manajemen Keuangan dengan Gamifikasi.\n\nBase URL: http://127.0.0.1:8000/api\n\nCara pakai:\n1. Import file ini ke Postman\n2. Set variable `base_url` dan `token` di Collection Variables\n3. Jalankan dulu Login/Register untuk mendapatkan token\n4. Akses endpoint lain dengan token",
+    "schema": "https://schema.postman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "base_url",
+      "value": "http://127.0.0.1:8000/api",
+      "type": "string"
+    },
+    {
+      "key": "token",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "transaction_id",
+      "value": "",
+      "type": "string"
+    }
+  ],
+  "auth": {
+    "type": "bearer",
+    "bearer": [
+      {
+        "key": "token",
+        "value": "{{token}}",
+        "type": "string"
+      }
+    ]
+  },
+  "item": [
+    {
+      "name": "Auth",
+      "description": "Endpoint autentikasi — register & login",
+      "item": [
+        {
+          "name": "Register User",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 201) {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.collectionVariables.set('token', jsonData.token);",
+                  "    console.log('Token tersimpan: ' + jsonData.token);",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Accept", "value": "application/json" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"name\": \"Budi Santoso\",\n    \"email\": \"budi@example.com\",\n    \"username\": \"budi123\",\n    \"password\": \"password123\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/register",
+              "host": ["{{base_url}}"],
+              "path": ["register"]
+            }
+          }
+        },
+        {
+          "name": "Login User",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 200) {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.collectionVariables.set('token', jsonData.token);",
+                  "    console.log('Token tersimpan: ' + jsonData.token);",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Accept", "value": "application/json" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"email\": \"budi@example.com\",\n    \"password\": \"password123\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/login",
+              "host": ["{{base_url}}"],
+              "path": ["login"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Public",
+      "description": "Endpoint publik (tanpa token)",
+      "item": [
+        {
+          "name": "Get All Categories",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Accept", "value": "application/json" }
+            ],
+            "url": {
+              "raw": "{{base_url}}/categories",
+              "host": ["{{base_url}}"],
+              "path": ["categories"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "User Dashboard",
+      "description": "Endpoint dashboard user (butuh token)",
+      "item": [
+        {
+          "name": "Get Dashboard",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Accept", "value": "application/json" }
+            ],
+            "url": {
+              "raw": "{{base_url}}/user/dashboard",
+              "host": ["{{base_url}}"],
+              "path": ["user", "dashboard"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Transactions",
+      "description": "CRUD transaksi (butuh token)",
+      "item": [
+        {
+          "name": "Get All Transactions",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Accept", "value": "application/json" }
+            ],
+            "url": {
+              "raw": "{{base_url}}/user/transactions?page=1&per_page=10&sort_by=transaction_date&sort_order=desc",
+              "host": ["{{base_url}}"],
+              "path": ["user", "transactions"],
+              "query": [
+                { "key": "page", "value": "1", "description": "Halaman" },
+                { "key": "per_page", "value": "10", "description": "Data per halaman" },
+                { "key": "type", "value": "", "description": "Filter: income / expense (kosongkan untuk semua)" },
+                { "key": "category_id", "value": "", "description": "Filter: ID kategori (kosongkan untuk semua)" },
+                { "key": "month", "value": "", "description": "Filter: YYYY-MM, contoh: 2026-06 (kosongkan untuk semua)" },
+                { "key": "sort_by", "value": "transaction_date", "description": "Kolom sorting" },
+                { "key": "sort_order", "value": "desc", "description": "asc / desc" }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Create Transaction (General)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 201) {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.collectionVariables.set('transaction_id', jsonData.data.id.toString());",
+                  "    console.log('Transaction ID tersimpan: ' + jsonData.data.id);",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Accept", "value": "application/json" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"type\": \"expense\",\n    \"category_id\": 5,\n    \"amount\": 50000,\n    \"description\": \"Beli makan siang\",\n    \"transaction_date\": \"2026-06-08\",\n    \"mode\": \"general\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/user/transactions",
+              "host": ["{{base_url}}"],
+              "path": ["user", "transactions"]
+            }
+          }
+        },
+        {
+          "name": "Get Transaction Detail",
+          "request": {
+            "method": "GET",
+            "description": "ID otomatis dari Create Transaction",
+            "header": [
+              { "key": "Accept", "value": "application/json" }
+            ],
+            "url": {
+              "raw": "{{base_url}}/user/transactions/{{transaction_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["user", "transactions", "{{transaction_id}}"]
+            }
+          }
+        },
+        {
+          "name": "Update Transaction",
+          "request": {
+            "method": "PUT",
+            "description": "ID otomatis dari Create Transaction",
+            "header": [
+              { "key": "Accept", "value": "application/json" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"amount\": 75000,\n    \"description\": \"Beli makan siang (update)\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/user/transactions/{{transaction_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["user", "transactions", "{{transaction_id}}"]
+            }
+          }
+        },
+        {
+          "name": "Delete Transaction",
+          "request": {
+            "method": "DELETE",
+            "description": "ID otomatis dari Create Transaction",
+            "header": [
+              { "key": "Accept", "value": "application/json" }
+            ],
+            "url": {
+              "raw": "{{base_url}}/user/transactions/{{transaction_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["user", "transactions", "{{transaction_id}}"]
+            }
+          }
+        }
+      ]
+    }
+  ]
+}

@@ -16,10 +16,10 @@ class DashboardResource extends JsonResource
                 'username' => $this->username,
                 'email' => $this->email,
             ],
-            'gamification' => $this->resource['gamification'] ?? null,
-            'financial_summary' => $this->resource['financial_summary'] ?? null,
+            'gamification' => $this->resource->gamification ?? null,
+            'financial_summary' => $this->resource->financial_summary ?? null,
             'recent_transactions' => TransactionResource::collection(
-                $this->resource['recent_transactions'] ?? collect()
+                $this->resource->recent_transactions ?? collect()
             ),
         ];
     }

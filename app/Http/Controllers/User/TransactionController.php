@@ -25,15 +25,15 @@ class TransactionController extends Controller
         $user = $request->user();
         $query = $user->transactions()->with(['category']);
 
-        if ($request->has('type')) {
+        if ($request->filled('type')) {
             $query->where('type', $request->type);
         }
 
-        if ($request->has('category_id')) {
+        if ($request->filled('category_id')) {
             $query->where('category_id', $request->category_id);
         }
 
-        if ($request->has('month')) {
+        if ($request->filled('month')) {
             $query->byMonth($request->month);
         }
 
