@@ -139,6 +139,7 @@
             <a href="{{ route('dashboard.wallet') }}">Wallet</a>
             <a href="{{ route('dashboard.wallet.topup.form') }}">Top Up</a>
             <a href="{{ route('dashboard.wallet.transfer.form') }}">Transfer</a>
+            <a href="{{ route('dashboard.wallet.withdraw.form') }}">Withdraw</a>
             <a href="{{ route('dashboard.friends') }}">Teman</a>
         </nav>
 
@@ -156,6 +157,7 @@
                 <div class="wallet-actions">
                     <a class="btn btn-primary" href="{{ route('dashboard.wallet.topup.form') }}">TOP UP</a>
                     <a class="btn btn-soft" href="{{ route('dashboard.wallet.transfer.form') }}">TRANSFER</a>
+                    <a class="btn btn-soft" href="{{ route('dashboard.wallet.withdraw.form') }}">WITHDRAW</a>
                 </div>
             </div>
             <div class="balance">

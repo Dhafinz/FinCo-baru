@@ -139,6 +139,7 @@
             <a href="<?php echo e(route('dashboard.wallet')); ?>">Wallet</a>
             <a href="<?php echo e(route('dashboard.wallet.topup.form')); ?>">Top Up</a>
             <a href="<?php echo e(route('dashboard.wallet.transfer.form')); ?>">Transfer</a>
+            <a href="<?php echo e(route('dashboard.wallet.withdraw.form')); ?>">Withdraw</a>
             <a href="<?php echo e(route('dashboard.friends')); ?>">Teman</a>
         </nav>
 
@@ -156,6 +157,7 @@
                 <div class="wallet-actions">
                     <a class="btn btn-primary" href="<?php echo e(route('dashboard.wallet.topup.form')); ?>">TOP UP</a>
                     <a class="btn btn-soft" href="<?php echo e(route('dashboard.wallet.transfer.form')); ?>">TRANSFER</a>
+                    <a class="btn btn-soft" href="<?php echo e(route('dashboard.wallet.withdraw.form')); ?>">WITHDRAW</a>
                 </div>
             </div>
             <div class="balance">

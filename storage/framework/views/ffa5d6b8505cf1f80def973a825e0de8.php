@@ -42,50 +42,49 @@
 <body>
 <div class="container">
     <nav class="nav">
-        <a href="{{ route('dashboard') }}">← Dashboard</a>
-        <a href="{{ route('dashboard.wallet') }}">Wallet</a>
-        <a href="{{ route('dashboard.wallet.transfer.form') }}">Transfer</a>
-        <a href="{{ route('dashboard.wallet.withdraw.form') }}">Withdraw</a>
+        <a href="<?php echo e(route('dashboard')); ?>">← Dashboard</a>
+        <a href="<?php echo e(route('dashboard.wallet')); ?>">Wallet</a>
+        <a href="<?php echo e(route('dashboard.wallet.transfer.form')); ?>">Transfer</a>
     </nav>
 
-    @if (session('success'))
-        <div class="alert ok">{{ session('success') }}</div>
-    @endif
-    @if ($errors->any())
-        <div class="alert err">{{ $errors->first() }}</div>
-    @endif
+    <?php if(session('success')): ?>
+        <div class="alert ok"><?php echo e(session('success')); ?></div>
+    <?php endif; ?>
+    <?php if($errors->any()): ?>
+        <div class="alert err"><?php echo e($errors->first()); ?></div>
+    <?php endif; ?>
 
     <section class="card">
         <div class="hero">
             <h1>💳 Top Up Saldo</h1>
-            <p>Saldo sekarang: Rp {{ number_format((float) $wallet->balance, 0, ',', '.') }}</p>
+            <p>Saldo sekarang: Rp <?php echo e(number_format((float) $wallet->balance, 0, ',', '.')); ?></p>
         </div>
         <div class="body">
-            <form action="{{ route('dashboard.wallet.topup') }}" method="POST">
-                @csrf
+            <form action="<?php echo e(route('dashboard.wallet.topup')); ?>" method="POST">
+                <?php echo csrf_field(); ?>
                 <div class="row">
                     <label class="label">Pilih Nominal</label>
                     <div class="chips">
-                        @foreach ($presetAmounts as $preset)
+                        <?php $__currentLoopData = $presetAmounts; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $preset): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
                             <label class="chip">
-                                <input type="radio" name="selected_amount" value="{{ $preset }}" {{ (int) old('selected_amount', 100000) === (int) $preset ? 'checked' : '' }}>
-                                <span>{{ number_format($preset / 1000, 0, ',', '.') }}k</span>
+                                <input type="radio" name="selected_amount" value="<?php echo e($preset); ?>" <?php echo e((int) old('selected_amount', 100000) === (int) $preset ? 'checked' : ''); ?>>
+                                <span><?php echo e(number_format($preset / 1000, 0, ',', '.')); ?>k</span>
                             </label>
-                        @endforeach
+                        <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                     </div>
                 </div>
 
                 <div class="row">
                     <label class="label">Atau ketik nominal manual</label>
-                    <input type="number" name="amount" min="50000" step="1000" value="{{ old('amount') }}" placeholder="Contoh: 150000">
+                    <input type="number" name="amount" min="50000" step="1000" value="<?php echo e(old('amount')); ?>" placeholder="Contoh: 150000">
                 </div>
 
                 <div class="row">
                     <label class="label">Metode Pembayaran</label>
                     <div class="methods">
-                        <label class="method"><input type="radio" name="payment_method" value="bank_transfer" {{ old('payment_method', 'bank_transfer') === 'bank_transfer' ? 'checked' : '' }}> Bank Transfer BCA</label>
-                        <label class="method"><input type="radio" name="payment_method" value="virtual_account" {{ old('payment_method') === 'virtual_account' ? 'checked' : '' }}> Virtual Account</label>
-                        <label class="method"><input type="radio" name="payment_method" value="qris" {{ old('payment_method') === 'qris' ? 'checked' : '' }}> QRIS</label>
+                        <label class="method"><input type="radio" name="payment_method" value="bank_transfer" <?php echo e(old('payment_method', 'bank_transfer') === 'bank_transfer' ? 'checked' : ''); ?>> Bank Transfer BCA</label>
+                        <label class="method"><input type="radio" name="payment_method" value="virtual_account" <?php echo e(old('payment_method') === 'virtual_account' ? 'checked' : ''); ?>> Virtual Account</label>
+                        <label class="method"><input type="radio" name="payment_method" value="qris" <?php echo e(old('payment_method') === 'qris' ? 'checked' : ''); ?>> QRIS</label>
                     </div>
                 </div>
 
@@ -93,18 +92,19 @@
                 <div class="note">Simulasi: transaksi langsung sukses tanpa payment gateway.</div>
             </form>
 
-            @if (!empty($receipt))
+            <?php if(!empty($receipt)): ?>
                 <div class="receipt">
                     <h3>✅ Top Up Berhasil!</h3>
-                    <p>Nominal: Rp {{ number_format((float) $receipt['amount'], 0, ',', '.') }}</p>
-                    <p>Metode: {{ $receipt['method'] }}</p>
-                    <p>Saldo: Rp {{ number_format((float) $receipt['before'], 0, ',', '.') }} → Rp {{ number_format((float) $receipt['after'], 0, ',', '.') }}</p>
-                    <p>Ref: {{ $receipt['reference'] }}</p>
-                    <p>XP: +{{ $receipt['xp'] }} 🎮</p>
+                    <p>Nominal: Rp <?php echo e(number_format((float) $receipt['amount'], 0, ',', '.')); ?></p>
+                    <p>Metode: <?php echo e($receipt['method']); ?></p>
+                    <p>Saldo: Rp <?php echo e(number_format((float) $receipt['before'], 0, ',', '.')); ?> → Rp <?php echo e(number_format((float) $receipt['after'], 0, ',', '.')); ?></p>
+                    <p>Ref: <?php echo e($receipt['reference']); ?></p>
+                    <p>XP: +<?php echo e($receipt['xp']); ?> 🎮</p>
                 </div>
-            @endif
+            <?php endif; ?>
         </div>
     </section>
 </div>
 </body>
 </html>
+<?php /**PATH C:\finco\resources\views/wallet/topup.blade.php ENDPATH**/ ?>

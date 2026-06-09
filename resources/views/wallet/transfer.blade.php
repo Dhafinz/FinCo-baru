@@ -36,6 +36,7 @@
     <nav class="nav">
         <a href="{{ route('dashboard') }}">← Dashboard</a>
         <a href="{{ route('dashboard.wallet') }}">Wallet</a>
+        <a href="{{ route('dashboard.wallet.withdraw.form') }}">Withdraw</a>
         <a href="{{ route('dashboard.friends') }}">Teman</a>
     </nav>
 

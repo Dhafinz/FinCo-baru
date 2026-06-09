@@ -28,9 +28,12 @@
                 </div>
             </div>
 
-            <div class="header-search">
-                <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-                <input type="text" placeholder="Cari sesuatu..." id="globalSearch">
+            <div class="header-search" style="max-width:none;flex:0">
+                <span style="font-size:13px;color:var(--text-secondary);font-weight:500;white-space:nowrap">
+                    <?php (\Carbon\Carbon::setLocale('id')); ?>
+                    <?php echo e(now()->translatedFormat('l, d F Y')); ?>
+
+                </span>
             </div>
 
             <div class="header-right">
