@@ -1,19 +1,19 @@
-@extends('admin.layouts.admin')
 
-@section('title', 'Tambah Quest')
-@section('breadcrumb', 'Quests / Tambah')
-@section('page_title', 'Tambah Quest')
-@section('page_subtitle', 'Buat quest baru')
 
-@section('content')
-<form class="admin-form" method="POST" action="{{ route('admin.quests.store') }}">
-    @csrf
+<?php $__env->startSection('title', 'Tambah Quest'); ?>
+<?php $__env->startSection('breadcrumb', 'Quests / Tambah'); ?>
+<?php $__env->startSection('page_title', 'Tambah Quest'); ?>
+<?php $__env->startSection('page_subtitle', 'Buat quest baru'); ?>
+
+<?php $__env->startSection('content'); ?>
+<form class="admin-form" method="POST" action="<?php echo e(route('admin.quests.store')); ?>">
+    <?php echo csrf_field(); ?>
     <div class="form-group">
         <label class="form-label">User</label>
         <select class="form-control" name="user_id" required>
-            @foreach ($users as $user)
-                <option value="{{ $user->id }}">{{ $user->name }}</option>
-            @endforeach
+            <?php $__currentLoopData = $users; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $user): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                <option value="<?php echo e($user->id); ?>"><?php echo e($user->name); ?></option>
+            <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
         </select>
     </div>
     <div class="form-group">
@@ -75,9 +75,9 @@
         <label class="form-label">Kategori Expense</label>
         <select class="form-control" name="category_id">
             <option value="">— Pilih Kategori —</option>
-            @foreach ($categories as $cat)
-                <option value="{{ $cat->id }}">{{ $cat->name }}</option>
-            @endforeach
+            <?php $__currentLoopData = $categories; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $cat): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                <option value="<?php echo e($cat->id); ?>"><?php echo e($cat->name); ?></option>
+            <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
         </select>
     </div>
     <div class="form-group">
@@ -100,4 +100,6 @@
     </script>
     <button class="btn btn-primary" type="submit">Simpan</button>
 </form>
-@endsection
+<?php $__env->stopSection(); ?>
+
+<?php echo $__env->make('admin.layouts.admin', array_diff_key(get_defined_vars(), ['__data' => 1, '__path' => 1]))->render(); ?><?php /**PATH C:\finco\resources\views/admin/quests/create.blade.php ENDPATH**/ ?>

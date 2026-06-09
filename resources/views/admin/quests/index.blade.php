@@ -24,6 +24,8 @@
                 <th>ID</th>
                 <th>User</th>
                 <th>Nama</th>
+                <th>Tipe</th>
+                <th>Target</th>
                 <th>Difficulty</th>
                 <th>Reward XP</th>
                 <th>Status</th>
@@ -36,6 +38,15 @@
                     <td>#{{ $quest->id }}</td>
                     <td>{{ $quest->user_id }}</td>
                     <td style="font-weight:600">{{ $quest->name }}</td>
+                    <td>
+                        @php
+                            $c = is_array($quest->criteria) ? $quest->criteria : [];
+                            $track = $c['tracking'] ?? '-';
+                            $tipe = in_array($track, ['income_total']) ? 'Income' : (in_array($track, ['expense_category_total','expense_total','no_spend_days']) ? 'Expense' : 'Umum');
+                        @endphp
+                        {{ $tipe }}
+                    </td>
+                    <td>{{ number_format($c['target'] ?? 0, 0, ',', '.') }}</td>
                     <td>
                         <span class="status-badge {{ $quest->difficulty === 'easy' ? 'on_track' : ($quest->difficulty === 'medium' ? 'warning' : 'exceeded') }}">
                             <span class="dot"></span>

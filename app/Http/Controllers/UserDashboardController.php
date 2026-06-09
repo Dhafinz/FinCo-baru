@@ -201,8 +201,8 @@ class UserDashboardController extends Controller
                 ->with('success', $message);
         }
 
-        // Handle Income Mode (Goal allocation)
-        if ($validated['type'] === 'income') {
+        // Handle Income Mode (Goal allocation) — only when mode is explicitly 'income'
+        if ($validated['type'] === 'income' && ($validated['mode'] ?? 'general') === 'income') {
             $categoryId = $this->hasCategoryColumns() ? ($validated['category_id'] ?? null) : null;
             $goalId = (int) ($validated['goal_id'] ?? 0);
 
@@ -666,6 +666,10 @@ class UserDashboardController extends Controller
         $data['leaderboardRows'] = $this->leaderboardRows();
         $data['leaderboardViewerId'] = $user->id;
         $data['badgeCatalog'] = $this->badgeCatalogForUser($user->id);
+
+        // Sync quest progress first, so expired quests get marked as failed before loading data
+        $this->syncQuestProgressFromTransaction($user->id, now()->toDateString());
+
         $data['quests'] = Quest::query()->where('user_id', $user->id)->where('status', 'active')->orderBy('end_date')->get();
         $data['allQuests'] = Quest::query()->where('user_id', $user->id)->orderByDesc('created_at')->get();
         
@@ -683,8 +687,6 @@ class UserDashboardController extends Controller
         $data['questSelectedKey'] = $request->query('quest_key', null);
         $data['questSelectedTemplate'] = $data['questSelectedKey'] ? $this->questTemplateByKey((string) $data['questSelectedKey']) : null;
         $data['questSelectedCategoryId'] = $data['questSelectedTemplate'] ? $this->questCategoryId($data['questSelectedTemplate']) : null;
-
-        $this->syncQuestProgressFromTransaction($user->id, now()->toDateString());
 
         // Check & award budget badges saat budget page di-render
         if ($feature === 'budgets') {
@@ -1374,7 +1376,6 @@ class UserDashboardController extends Controller
         $activeQuests = Quest::query()
             ->where('user_id', $userId)
             ->where('status', 'active')
-            ->where('end_date', '>=', $date)
             ->get();
 
         $completedCount = 0;

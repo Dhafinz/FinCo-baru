@@ -207,9 +207,7 @@
                     <span>Ingat saya</span>
                 </label>
 
-                <?php if(Route::has('password.request')): ?>
-                    <a class="forgot" href="<?php echo e(route('password.request')); ?>">Lupa password?</a>
-                <?php endif; ?>
+
             </div>
 
             <button class="btn" type="submit">Masuk</button>

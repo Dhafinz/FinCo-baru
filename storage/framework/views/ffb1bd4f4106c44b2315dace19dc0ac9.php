@@ -1675,11 +1675,11 @@
                             <section class="hero card">
                                 <div>
                                     <h1>Fitur Budget</h1>
-                                    <p>Kontrol pengeluaran dengan membandingkan income, expense, dan saldo berjalan.</p>
+                                    <p>Kontrol pengeluaran dengan membandingkan income, expense, dan sisa anggaran.</p>
                                 </div>
                                 <div class="hero-pill">
                                     <strong>Rp <?php echo e(number_format($balance, 0, ',', '.')); ?></strong>
-                                    <span>Sisa saldo saat ini</span>
+                                    <span>Sisa anggaran saat ini</span>
                                 </div>
                             </section>
 

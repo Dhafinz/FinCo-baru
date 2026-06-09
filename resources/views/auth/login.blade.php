@@ -207,9 +207,7 @@
                     <span>Ingat saya</span>
                 </label>
 
-                @if (Route::has('password.request'))
-                    <a class="forgot" href="{{ route('password.request') }}">Lupa password?</a>
-                @endif
+
             </div>
 
             <button class="btn" type="submit">Masuk</button>
